@@ -29,6 +29,13 @@ class GameController
 		FlxG.switchState(new PlayState(GameStatus.currentMap));
 	}
 	
+	public static function Teleport()
+	{
+		GameStatus.currentMap = GameStatus.lastTeleport.target;
+	
+		FlxG.switchState(new PlayState(GameStatus.currentMap));
+	}
+	
 	/** Status handling functions **/
 	
 	public static function NewGame()
@@ -56,7 +63,7 @@ class GameController
 		
 		GameStatus = {
 			currentMap: "w0m0",
-			teleportId: "",
+			lastTeleport: null,
 			coins: 0
 		};
 	}
@@ -118,6 +125,6 @@ class GameController
 
 typedef GameStatusData = { 
 	currentMap: String,
-	teleportId: String,
+	lastTeleport: Teleport.TeleportData,
 	coins: Int
 }

@@ -1,11 +1,13 @@
 package;
 
+import flixel.util.FlxPoint;
+
 class Player extends Entity
 {
-	public var WalkHSpeed : Float = 100;
-	public var WalkHAcceleration : Float = 900;
-	public var WalkVSpeed : Float = 70;
-	public var WalkVAcceleration : Float = 500;
+	public var WalkHSpeed : Float = 80;
+	public var WalkHAcceleration : Float = 800;
+	public var WalkVSpeed : Float = 65;
+	public var WalkVAcceleration : Float = 450;
 
 	public function new(X : Int, Y : Int, World : PlayState)
 	{
@@ -16,7 +18,7 @@ class Player extends Entity
 		offset.set(1, 10);
 		
 		maxVelocity.set(WalkHSpeed, WalkVSpeed);
-		drag.set(900, 500);
+		drag.set(WalkHAcceleration * 1.5, WalkVAcceleration * 1.5);
 	}
 	
 	override public function update()
@@ -42,6 +44,12 @@ class Player extends Entity
 			acceleration.y = 0;
 			
 		super.update();
+	}
+	
+	public function teleportTo(pos : FlxPoint) : Void
+	{
+		x = pos.x - width / 2;
+		y = pos.y - height / 2;
 	}
 	
 	public function onCollisionWithEnemy(enemy : Enemy)

@@ -120,12 +120,11 @@ class TiledLevel extends TiledMap
 		
 		/** Elements **/
 			case "teleport":
-				/*var type : Int = 0;
-				if (o.custom.contains("type"))
-					type = Std.parseInt(o.custom.get("type"));
-				var unlocks : String = o.custom.get("unlocks");
-				var goal : LevelGoal = new LevelGoal(x, y, type, unlocks);
-				state.levelGoals.add(goal);*/
+				var target = o.custom.get("target");
+				var name = o.name;
+				
+				var teleport : Teleport = new Teleport(x, y, o.width, o.height, name, target);
+				state.teleports.add(teleport);
 				
 		/** Enemies **/
 			/*case "runner":

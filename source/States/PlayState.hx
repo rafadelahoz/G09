@@ -40,7 +40,7 @@ class PlayState extends GameState
 	
 	// public var collectibles : FlxTypedGroup<Collectible>;
 	
-	// public var teleports : FlxTypedGroup<Teleport>;
+	public var teleports : FlxTypedGroup<Teleport>;
 
 	// General entities list for pausing
 	public var entities : FlxTypedGroup<Entity>;
@@ -77,7 +77,7 @@ class PlayState extends GameState
 			enemies.add(nonCollidableEnemies);
 
 		// collectibles = new FlxTypedGroup<Collectible>();
-		// teleports = new FlxTypedGroup<Teleport>();
+		teleports = new FlxTypedGroup<Teleport>();
 
 		// Load the tiled level
 		level = new TiledLevel("assets/maps/" + mapName + ".tmx");
@@ -90,11 +90,13 @@ class PlayState extends GameState
 		// Load level objects
 		level.loadObjects(this);
 
-		// add(teleports);
+		add(teleports);
 		
 		add(enemies);
 
 		add(player);
+		
+		handlePlayerPosition();
 		
 		// add(collectibles);
 
@@ -111,7 +113,7 @@ class PlayState extends GameState
 			
 		// Prepare death manager
 		playflowManager = PlayFlowManager.get(this/*, gui*/);
-
+		
 		// Delegate
 		super.create();
 	}
@@ -183,7 +185,7 @@ class PlayState extends GameState
 			FlxG.collide(collidableEnemies);
 
 			// Player vs Teleports
-			// FlxG.overlap(teleports, player, onTeleportCollision);
+			FlxG.overlap(teleports, player, onTeleportCollision);
 			
 			/* Update the GUI */
 			// gui.updateGUI(icecream, this);
@@ -250,10 +252,19 @@ class PlayState extends GameState
 		// Don't notify the player for now
 	}*/
 	
-	/*public function onTeleportCollision(teleport : Teleport, player : Player)
+	public function onTeleportCollision(teleport : Teleport, player : Player)
 	{
-		playflowManager.onGoal(teleport);
-	}*/
+		// playflowManager.onGoal(teleport);
+		
+		FlxObject.separate(teleport, player);
+		
+		var pos : FlxPoint = teleport.computePosition(player.getMidpoint());		
+		
+		GameController.GameStatus.lastTeleport = teleport.getData();
+		GameController.GameStatus.lastTeleport.position = pos;
+		
+		GameController.Teleport();
+	}
 
 	public function addPlayer(p : Player) : Void
 	{
@@ -271,6 +282,24 @@ class PlayState extends GameState
 			collidableEnemies.add(enemy);
 		else
 			nonCollidableEnemies.add(enemy);
+	}
+	
+	public function handlePlayerPosition()
+	{
+		var lastTeleportData : Teleport.TeleportData = GameController.GameStatus.lastTeleport;
+		if (lastTeleportData != null)
+		{
+			// Locate the actual teleport
+			for (teleport in teleports)
+			{
+				if (teleport.name == lastTeleportData.name)
+				{
+					var position = teleport.decodePosition(lastTeleportData.position);
+					player.teleportTo(position);
+					break;
+				}
+			}
+		}
 	}
 	
 	function doDebug() : Void
