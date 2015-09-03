@@ -11,6 +11,7 @@ class Entity extends FlxSprite
 	public var collideWithEnemies : Bool;
 	
 	public var baseline : Float;
+	public var shadow : FlxSprite;
 
 	public function new(X : Float, Y : Float, World : PlayState)
 	{
@@ -21,6 +22,9 @@ class Entity extends FlxSprite
 		collideWithEnemies = true;
 		
 		baseline = y + height;
+
+		shadow = new FlxSprite(x, baseline).loadGraphic("assets/images/shadow.png");
+		shadow.solid = false;
 		
 		world.entities.add(this);
 	}
