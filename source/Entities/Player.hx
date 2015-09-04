@@ -2,6 +2,7 @@ package;
 
 import flixel.FlxObject;
 import flixel.util.FlxPoint;
+import flixel.util.FlxTimer;
 
 class Player extends Entity
 {
@@ -11,6 +12,9 @@ class Player extends Entity
 	public var WalkVAcceleration : Float = 450;
 
 	var shooterComponent : ShooterComponent;
+	var timer : FlxTimer;
+	
+	var shooting : Bool;
 	
 	public function new(X : Int, Y : Int, World : PlayState)
 	{
@@ -32,6 +36,10 @@ class Player extends Entity
 		// Pistol shooter component
 		shooterComponent = new ShooterComponent();
 		shooterComponent.init(world, 15, PlayerBullet.BulletType.Pistol);
+		
+		shooting = false;
+		
+		timer = new FlxTimer();
 	}
 	
 	override public function update()
@@ -39,29 +47,32 @@ class Player extends Entity
 		if (frozen)
 			return;
 	
-		if (GamePad.checkButton(GamePad.Left))
+		if (!shooting)
 		{
-			acceleration.x = -WalkHAcceleration;
-			facing = FlxObject.LEFT;
+			if (GamePad.checkButton(GamePad.Left))
+			{
+				acceleration.x = -WalkHAcceleration;
+				facing = FlxObject.LEFT;
+			}
+			else if (GamePad.checkButton(GamePad.Right))
+			{
+				acceleration.x = WalkHAcceleration;
+				facing = FlxObject.RIGHT;
+			}
+			else
+				acceleration.x = 0;
+			
+			if (GamePad.checkButton(GamePad.Up))
+				acceleration.y = -WalkVAcceleration;
+			else if (GamePad.checkButton(GamePad.Down))
+				acceleration.y = WalkVAcceleration;
+			else
+				acceleration.y = 0;
+				
+			if (acceleration.x != 0)
+				acceleration.y = 0;
 		}
-		else if (GamePad.checkButton(GamePad.Right))
-		{
-			acceleration.x = WalkHAcceleration;
-			facing = FlxObject.RIGHT;
-		}
-		else
-			acceleration.x = 0;
 		
-		if (GamePad.checkButton(GamePad.Up))
-			acceleration.y = -WalkVAcceleration;
-		else if (GamePad.checkButton(GamePad.Down))
-			acceleration.y = WalkVAcceleration;
-		else
-			acceleration.y = 0;
-			
-		if (acceleration.x != 0)
-			acceleration.y = 0;
-			
 		handleShooting();
 
 		if (acceleration.x != 0)
@@ -89,6 +100,11 @@ class Player extends Entity
 			// And pause
 			acceleration.set();
 			velocity.set();
+			// For a little while
+			shooting = true;
+			timer.start(shooterComponent.getDelay(), function(_t:FlxTimer) {
+				shooting = false;
+			});
 		}
 	}
 	

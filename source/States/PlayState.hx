@@ -179,27 +179,39 @@ class PlayState extends GameState
 				openSubState(new PauseMenu());
 			}
 		
-			/* Resolve collisions */
+			/* Resolve vs World collisions */
+			
+			// Switch to movement masks!
+			entities.callAll("setMovementMask");
+			
 			// Enemies vs World
 			resolveEnemiesWorldCollision();
 
 			// Player vs World
 			level.collideWithLevel(player);
 			
+			// Player vs Teleports
+			FlxG.overlap(teleports, player, onTeleportCollision);
+			
 			// Player bullets vs World
 			resolveGroupWorldCollision(playerBullets);
 			
+			/* Resolve vs World collisions */
+			
+			// Switch to fight masks!
+			entities.callAll("setCollisionMask");
+			
 			// Player vs Collectibles
 			// FlxG.overlap(collectibles, player, onCollectibleCollision);
+			
+			// PlayerBullets vs Enemies
+			FlxG.overlap(playerBullets, enemies, onBulletEnemyCollision);
 			
 			// Player vs Enemies
 			FlxG.overlap(enemies, player, onEnemyCollision);
 			
 			// Enemies vs enemies
 			FlxG.collide(collidableEnemies);
-
-			// Player vs Teleports
-			FlxG.overlap(teleports, player, onTeleportCollision);
 			
 			/* Update the GUI */
 			// gui.updateGUI(icecream, this);
@@ -259,6 +271,12 @@ class PlayState extends GameState
 		playflowManager.onDraw();
 	}
 
+	public function onBulletEnemyCollision(bullet : PlayerBullet, enemy : Enemy) : Void
+	{
+		bullet.onCollisionWithEnemy(enemy);
+		enemy.onCollisionWithPlayerBullet(bullet);
+	}
+	
 	public function onEnemyCollision(one : Enemy, two : Player) : Void
 	{
 		FlxObject.separate(one, two);
@@ -341,6 +359,9 @@ class PlayState extends GameState
 		
 		if (FlxG.mouse.justPressed)
 		{
+			var enemy : Enemy = new EnemyWalker(mousePos.x, mousePos.y, this);
+			enemy.init(0);
+			addEnemy(enemy);
 		}
 		
 		if (FlxG.keys.anyJustPressed(["T"]))

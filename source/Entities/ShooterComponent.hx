@@ -7,6 +7,9 @@ class ShooterComponent
 {
 	public static var PistolBulletSpeed : Float = 300;
 	public static var BlasterBulletSpeed : Float = 320;
+	
+	public static var PistolDelay : Float = 0.2;
+	public static var BlasterDelay : Float = 0.05;
 
 	var type : PlayerBullet.BulletType;
 
@@ -43,6 +46,17 @@ class ShooterComponent
 		var bullet : PlayerBullet = bullets.recycle(PlayerBullet);
 		var shotSpeed : FlxPoint = CalculateShootVelocity(from, target, bulletSpeed, type);
 		bullet.init(Std.int(from.x), Std.int(from.y), shotSpeed.x, shotSpeed.y);
+	}
+	
+	public function getDelay() : Float
+	{
+		switch (type)
+		{
+			case PlayerBullet.BulletType.Pistol:
+				return PistolDelay;
+			case PlayerBullet.BulletType.Blaster:
+				return BlasterDelay;
+		}
 	}
 	
 	public function destroy()
