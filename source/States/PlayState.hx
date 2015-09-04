@@ -33,10 +33,13 @@ class PlayState extends GameState
 	
 	public var level : TiledLevel;
 
-	
 	public var enemies : FlxGroup;
 		public var collidableEnemies : FlxGroup;
 		public var nonCollidableEnemies : FlxGroup;
+		
+	public var playerBullets : FlxGroup;
+	
+	public var enemyBullets : FlxGroup;
 	
 	// public var collectibles : FlxTypedGroup<Collectible>;
 	
@@ -75,6 +78,10 @@ class PlayState extends GameState
 			nonCollidableEnemies = new FlxGroup();
 			enemies.add(collidableEnemies);
 			enemies.add(nonCollidableEnemies);
+			
+		playerBullets = new FlxGroup();
+		
+		enemyBullets = new FlxGroup();
 
 		// collectibles = new FlxTypedGroup<Collectible>();
 		teleports = new FlxTypedGroup<Teleport>();
@@ -95,6 +102,10 @@ class PlayState extends GameState
 		add(enemies);
 
 		add(player);
+		
+		add(playerBullets);
+		
+		add(enemyBullets);
 		
 		handlePlayerPosition();
 		
@@ -175,6 +186,9 @@ class PlayState extends GameState
 			// Player vs World
 			level.collideWithLevel(player);
 			
+			// Player bullets vs World
+			resolveGroupWorldCollision(playerBullets);
+			
 			// Player vs Collectibles
 			// FlxG.overlap(collectibles, player, onCollectibleCollision);
 			
@@ -207,6 +221,21 @@ class PlayState extends GameState
 
 		/* Go on */
 		super.update();
+	}
+	
+	function resolveGroupWorldCollision(group : FlxGroup) : Void
+	{
+		for (element in group)
+		{
+			if (Std.is(element, FlxGroup))
+			{
+				resolveGroupWorldCollision(cast(element, FlxGroup));
+			}
+			else
+			{
+				level.collideWithLevel(cast element);
+			}
+		}
 	}
 	
 	function resolveEnemiesWorldCollision() : Void

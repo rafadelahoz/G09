@@ -10,6 +10,8 @@ class Player extends Entity
 	public var WalkVSpeed : Float = 65;
 	public var WalkVAcceleration : Float = 450;
 
+	var shooterComponent : ShooterComponent;
+	
 	public function new(X : Int, Y : Int, World : PlayState)
 	{
 		super(X, Y, World);
@@ -26,6 +28,10 @@ class Player extends Entity
 		
 		maxVelocity.set(WalkHSpeed, WalkVSpeed);
 		drag.set(WalkHAcceleration * 1.5, WalkVAcceleration * 1.5);
+		
+		// Pistol shooter component
+		shooterComponent = new ShooterComponent();
+		shooterComponent.init(world, 15, PlayerBullet.BulletType.Pistol);
 	}
 	
 	override public function update()
@@ -55,6 +61,8 @@ class Player extends Entity
 			
 		if (acceleration.x != 0)
 			acceleration.y = 0;
+			
+		handleShooting();
 
 		if (acceleration.x != 0)
 			animation.play("walk");
@@ -72,19 +80,50 @@ class Player extends Entity
 		shadow.update();
 	}
 
+	function handleShooting() : Void
+	{
+		if (GamePad.justPressed(GamePad.B))
+		{
+			// Shoot!
+			shooterComponent.shoot(getShootpoint(), getTargetpoint());
+			// And pause
+			acceleration.set();
+			velocity.set();
+		}
+	}
+	
+	public function onCollisionWithEnemy(enemy : Enemy)
+	{
+	}
+	
 	override public function draw() : Void
 	{
 		shadow.draw();
 		super.draw();
 	}
 	
+	public function getShootpoint() : FlxPoint
+	{
+		var ox : Float = getMidpoint().x;
+		var oy : Float = getMidpoint().y;
+		
+		return new FlxPoint(ox + (facing == FlxObject.LEFT ? -1 : 1) * 4, oy - 8);
+	}
+	
+	public function getTargetpoint() : FlxPoint
+	{
+		var midpoint : FlxPoint = getMidpoint();
+		if (facing == FlxObject.LEFT)
+			midpoint.x -= 16;
+		else
+			midpoint.x += 16;
+			
+		return midpoint;
+	}
+	
 	public function teleportTo(pos : FlxPoint) : Void
 	{
 		x = pos.x - width / 2;
 		y = pos.y - height / 2;
-	}
-	
-	public function onCollisionWithEnemy(enemy : Enemy)
-	{
 	}
 }
