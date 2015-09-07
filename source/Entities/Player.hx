@@ -3,6 +3,7 @@ package;
 import flixel.FlxObject;
 import flixel.util.FlxPoint;
 import flixel.util.FlxTimer;
+import flixel.tweens.FlxTween;
 
 class Player extends Entity
 {
@@ -10,11 +11,18 @@ class Player extends Entity
 	public var WalkHAcceleration : Float = 800;
 	public var WalkVSpeed : Float = 65;
 	public var WalkVAcceleration : Float = 450;
+	
+	public var RollDuration : Float = 0.4;
+	public var RollHSpeed : Float = 100;
+	public var RollVSpeed : Float = 80;
 
 	var shooterComponent : ShooterComponent;
 	var timer : FlxTimer;
 	
 	var shooting : Bool;
+	var rolling : Bool;
+	var lastDirection : Int;
+	var rollSpeed : FlxPoint;
 	
 	public function new(X : Int, Y : Int, World : PlayState)
 	{
@@ -38,8 +46,12 @@ class Player extends Entity
 		shooterComponent.init(world, 15, PlayerBullet.BulletType.Pistol);
 		
 		shooting = false;
+		rolling = false;
+		rollSpeed = new FlxPoint();
 		
 		timer = new FlxTimer();
+		
+		lastDirection = FlxObject.RIGHT;
 	}
 	
 	override public function update()
@@ -47,42 +59,69 @@ class Player extends Entity
 		if (frozen)
 			return;
 	
-		if (!shooting)
+		if (rolling)
 		{
+			velocity.x = rollSpeed.x;
+			velocity.y = rollSpeed.y;
+			
 			if (GamePad.checkButton(GamePad.Left))
 			{
-				acceleration.x = -WalkHAcceleration;
-				facing = FlxObject.LEFT;
+				lastDirection = FlxObject.LEFT;
 			}
 			else if (GamePad.checkButton(GamePad.Right))
 			{
-				acceleration.x = WalkHAcceleration;
-				facing = FlxObject.RIGHT;
+				lastDirection = FlxObject.RIGHT;
 			}
-			else
-				acceleration.x = 0;
-			
-			if (GamePad.checkButton(GamePad.Up))
-				acceleration.y = -WalkVAcceleration;
-			else if (GamePad.checkButton(GamePad.Down))
-				acceleration.y = WalkVAcceleration;
-			else
-				acceleration.y = 0;
-				
-			if (acceleration.x != 0)
-				acceleration.y = 0;
 		}
-		
-		handleShooting();
-
-		if (acceleration.x != 0)
-			animation.play("walk");
-		else if (acceleration.y != 0)
-			animation.play("walk-vertical");
 		else
-			animation.play("idle");
+		{
+			if (!shooting)
+			{
+				if (GamePad.checkButton(GamePad.Left))
+				{
+					acceleration.x = -WalkHAcceleration;
+					facing = FlxObject.LEFT;
+					lastDirection = FlxObject.LEFT;
+				}
+				else if (GamePad.checkButton(GamePad.Right))
+				{
+					acceleration.x = WalkHAcceleration;
+					facing = FlxObject.RIGHT;
+					lastDirection = FlxObject.RIGHT;
+				}
+				else
+					acceleration.x = 0;
+				
+				if (GamePad.checkButton(GamePad.Up))
+				{
+					acceleration.y = -WalkVAcceleration;
+					lastDirection = FlxObject.UP;
+				}
+				else if (GamePad.checkButton(GamePad.Down))
+				{
+					acceleration.y = WalkVAcceleration;
+					lastDirection = FlxObject.DOWN;
+				}
+				else
+					acceleration.y = 0;
+					
+				if (acceleration.x != 0)
+					acceleration.y = 0;
+					
+				handleRolling();
+			}
+			
+			handleShooting();
 
-		flipX = (facing == FlxObject.LEFT);
+			if (acceleration.x != 0)
+				animation.play("walk");
+			else if (acceleration.y != 0)
+				animation.play("walk-vertical");
+			else
+				animation.play("idle");
+
+			flipX = (facing == FlxObject.LEFT);
+		}
 			
 		super.update();
 
@@ -97,13 +136,56 @@ class Player extends Entity
 		{
 			// Shoot!
 			shooterComponent.shoot(getShootpoint(), getTargetpoint());
+			
 			// And pause
 			acceleration.set();
 			velocity.set();
+			
 			// For a little while
 			shooting = true;
+			
 			timer.start(shooterComponent.getDelay(), function(_t:FlxTimer) {
 				shooting = false;
+			});
+		}
+	}
+	
+	function handleRolling() : Void
+	{
+		if (GamePad.justPressed(GamePad.A) && !rolling)
+		{
+			rolling = true;
+			
+			acceleration.set();
+			velocity.set();
+			rollSpeed.set();
+			
+			switch (lastDirection)
+			{
+				case FlxObject.LEFT:
+					rollSpeed.x = -RollHSpeed;
+				case FlxObject.RIGHT:
+					rollSpeed.x = RollHSpeed;
+				case FlxObject.UP:
+					rollSpeed.y = -RollVSpeed;
+				case FlxObject.DOWN:
+					rollSpeed.y = RollVSpeed;
+			}
+			
+			velocity.x = rollSpeed.x;
+			velocity.y = rollSpeed.y;
+			
+			FlxTween.tween(this, {angle: (facing == FlxObject.LEFT ? -360 : 360)}, RollDuration, 
+				{
+					complete: function(t:FlxTween) { angle=0; }
+				});
+			
+			timer.start(RollDuration, function(_t:FlxTimer) {
+				rolling = false;
+				velocity.set();
+				
+				if (lastDirection == FlxObject.LEFT || lastDirection == FlxObject.RIGHT)
+					facing = lastDirection;
 			});
 		}
 	}
