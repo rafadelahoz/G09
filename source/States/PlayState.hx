@@ -194,7 +194,8 @@ class PlayState extends GameState
 			FlxG.overlap(teleports, player, onTeleportCollision);
 			
 			// Player bullets vs World
-			resolveGroupWorldCollision(playerBullets);
+			// TODO: Bullets should collide with tall obstacles!
+			// resolveGroupWorldCollision(playerBullets);
 			
 			/* Resolve vs World collisions */
 			
