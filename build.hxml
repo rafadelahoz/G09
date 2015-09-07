@@ -1,1 +1,31 @@
-# G90 build file or whatevers
+# G90 build file or whatevers-main ApplicationMain 
+-cp D:/Dev/Tools/HaxeToolkit/haxe/lib/flixel-addons/1,1,0
+-D flixel-addons=1.1.0
+-cp D:/Dev/Tools/HaxeToolkit/haxe/lib/openfl/3,1,4
+-D openfl=3.1.4
+-cp D:/Dev/Tools/HaxeToolkit/haxe/lib/flixel/3,3,11
+-D flixel=3.3.11
+-cp D:/Dev/Tools/HaxeToolkit/haxe/lib/lime/2,5,0
+-D lime=2.5.0
+-cp source
+-cp source/Debug
+-cp source/Meta
+-cp source/States
+-cp source/WorldMap
+-cp source/Effects
+-cp source/Entities
+-cp source/Entities/Items
+-cp source/Entities/GUI
+-cp source/Entities/Enemies
+-cp source/Entities/Hazards
+-D openfl-next
+-D tools=2.5.0
+-D no-compilation
+-D NAPE_RELEASE_BUILD
+-D openfl-flash
+-D FLX_RENDER_BLIT
+-D web
+-swf-version 11.8
+-swf export/flash/bin/G09.swf
+-swf-header 240:160:30:000000
+-cp export/flash/haxe
