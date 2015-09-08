@@ -12,6 +12,7 @@ import flixel.tile.FlxTilemap;
 import flixel.util.FlxTimer;
 import flixel.util.FlxPoint;
 import flixel.util.FlxRect;
+import flixel.util.FlxSort;
 import flixel.util.FlxRandom;
 using flixel.util.FlxSpriteUtil;
 
@@ -43,6 +44,7 @@ class PlayState extends GameState
 	
 	// public var collectibles : FlxTypedGroup<Collectible>;
 	
+	public var decoration : FlxTypedGroup<Decoration>;
 	public var teleports : FlxTypedGroup<Teleport>;
 
 	// General entities list for pausing
@@ -85,6 +87,8 @@ class PlayState extends GameState
 
 		// collectibles = new FlxTypedGroup<Collectible>();
 		teleports = new FlxTypedGroup<Teleport>();
+		
+		decoration = new FlxTypedGroup<Decoration>();
 
 		// Load the tiled level
 		level = new TiledLevel("assets/maps/" + mapName + ".tmx");
@@ -97,15 +101,19 @@ class PlayState extends GameState
 		// Load level objects
 		level.loadObjects(this);
 
-		add(teleports);
+		/*add(teleports);
 		
 		add(enemies);
+		
+		add(decoration);
 
 		add(player);
 		
 		add(playerBullets);
 		
-		add(enemyBullets);
+		add(enemyBullets);*/
+		
+		add(entities);
 		
 		handlePlayerPosition();
 		
@@ -150,10 +158,13 @@ class PlayState extends GameState
 		enemies.destroy();
 		enemies = null;
 		
-		/*teleports.destroy();
+		teleports.destroy();
 		teleports = null;
 		
-		collectibles.destroy();
+		decoration.destroy();
+		decoration = null;
+		
+		/*collectibles.destroy();
 		collectibles = null;*/
 		
 		/*gui.destroy();
@@ -190,12 +201,18 @@ class PlayState extends GameState
 			// Player vs World
 			level.collideWithLevel(player);
 			
+			// Player vs Decoration
+			FlxG.collide(decoration, player);
+			
 			// Player vs Teleports
 			FlxG.overlap(teleports, player, onTeleportCollision);
 			
 			// Player bullets vs World
 			// TODO: Bullets should collide with tall obstacles!
 			// resolveGroupWorldCollision(playerBullets);
+			
+			// Enemies vs enemies
+			FlxG.collide(collidableEnemies);
 			
 			/* Resolve vs World collisions */
 			
@@ -208,11 +225,14 @@ class PlayState extends GameState
 			// PlayerBullets vs Enemies
 			FlxG.overlap(playerBullets, enemies, onBulletEnemyCollision);
 			
+			// PlayerBullets vs Decoration
+			FlxG.overlap(playerBullets, decoration, onBulletDecorationCollision);
+			
 			// Player vs Enemies
 			FlxG.overlap(enemies, player, onEnemyCollision);
 			
-			// Enemies vs enemies
-			FlxG.collide(collidableEnemies);
+			// Switch to movement masks!
+			entities.callAll("setMovementMask");
 			
 			/* Update the GUI */
 			// gui.updateGUI(icecream, this);
@@ -234,6 +254,38 @@ class PlayState extends GameState
 
 		/* Go on */
 		super.update();
+		
+		/* Sort */
+		entities.sort(sortByBaseline, FlxSort.ASCENDING);
+	}
+	
+	public static function sortByBaseline(Order : Int, Obj1 : FlxBasic, Obj2 : FlxBasic) : Int
+	{
+		var result:Int = 0;
+		
+		var Value1 : Float;
+		var Value2 : Float;
+		
+		if (Std.is(Obj1, Entity))
+			Value1 = cast(Obj1, Entity).baseline;
+		else 
+			Value1 = cast(Obj1, FlxObject).y + cast(Obj1, FlxObject).height;
+			
+		if (Std.is(Obj2, Entity))
+			Value2 = cast(Obj2, Entity).baseline;
+		else
+			Value2 = (cast Obj2).y + (cast Obj2).height;
+		
+		if (Value1 < Value2)
+		{
+			result = Order;
+		}
+		else if (Value1 > Value2)
+		{
+			result = -Order;
+		}
+		
+		return result;
 	}
 	
 	function resolveGroupWorldCollision(group : FlxGroup) : Void
@@ -272,6 +324,11 @@ class PlayState extends GameState
 		playflowManager.onDraw();
 	}
 
+	public function onBulletDecorationCollision(bullet : PlayerBullet, decoration : Decoration) : Void
+	{
+		bullet.onCollisionWithDecoration(decoration);
+	}
+	
 	public function onBulletEnemyCollision(bullet : PlayerBullet, enemy : Enemy) : Void
 	{
 		bullet.onCollisionWithEnemy(enemy);

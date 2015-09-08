@@ -1,6 +1,7 @@
 package;
 
 import flixel.FlxSprite;
+using flixel.util.FlxSpriteUtil;
 
 class Entity extends FlxSprite
 {
@@ -12,6 +13,8 @@ class Entity extends FlxSprite
 	
 	public var baseline : Float;
 	public var shadow : FlxSprite;
+	
+	public var dbgBaseline : FlxSprite;
 
 	public function new(X : Float, Y : Float, World : PlayState)
 	{
@@ -27,6 +30,10 @@ class Entity extends FlxSprite
 		shadow.solid = false;
 		
 		world.entities.add(this);
+		
+		dbgBaseline = new FlxSprite(x - 8, y);
+		dbgBaseline.makeGraphic(16, 1);
+		dbgBaseline.drawLine(0, 0, dbgBaseline.width, dbgBaseline.height);
 	}
 
 	public function setMovementMask() : Void
@@ -41,6 +48,20 @@ class Entity extends FlxSprite
 		// Switch to the appropriate collision mask here
 		// It will be used for collisions vs bullets, enemies
 		// or powerups, so it should be body-sized
+	}
+	
+	override public function update()
+	{
+		super.update();
+		
+		dbgBaseline.x = Std.int(getMidpoint().x - dbgBaseline.width/2);
+		dbgBaseline.y = baseline;
+	}
+	
+	override public function draw()
+	{
+		super.draw();
+		dbgBaseline.draw();
 	}
 	
 	public function freeze() : Void
