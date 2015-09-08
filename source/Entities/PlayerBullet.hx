@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxG;
 import flixel.FlxObject;
 
 enum BulletType { Pistol; Blaster; }
@@ -25,6 +26,8 @@ class PlayerBullet extends Entity
 		centerOrigin();
 		
 		velocity.set(HSpeed, VSpeed);
+
+		baseline = FlxG.height;
 	}
 	
 	override public function update()

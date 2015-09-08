@@ -35,8 +35,8 @@ class Player extends Entity
 
 		animation.play("idle");
 
-		setSize(14, 12);
-		offset.set(9, 19);
+		setSize(14, 10);
+		offset.set(9, 21);
 		
 		maxVelocity.set(WalkHSpeed, WalkVSpeed);
 		drag.set(WalkHAcceleration * 1.5, WalkVAcceleration * 1.5);

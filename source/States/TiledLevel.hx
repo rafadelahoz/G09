@@ -156,7 +156,7 @@ class TiledLevel extends TiledMap
 	function getImageSource(gid : Int) : TiledImage
 	{
 		var image : TiledImage = imageCollection.get(gid);
-		image.imagePath = "assets/tilesets/" + image.sourceImage;
+		image.imagePath = "assets/tilesets/detail/" + image.sourceImage;
 		return image;
 	}
 	

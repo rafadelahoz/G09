@@ -67,8 +67,8 @@ class PlayState extends GameState
 	{
 
 		// Random Background color
-		/*var bgColors = [0xFFBE3241, 0xFFDF7A92, 0xFF3EA5F2, 0xFF545454, 0xFF24323F, 0xFF6888FC, 0xFF3C565C, 0xFF529023, 0xFFA6CD33, 0xFFFFFFFF, 0xFFF7E176, 0xFF574A38, 0xFF463C2D, 0xFF352D22, 0xFF231E17, 0xFF120F0C];
-		FlxG.camera.bgColor = bgColors[FlxRandom.intRanged(0, bgColors.length-1)];*/
+		var bgColors = [0xFFBE3241, 0xFFDF7A92, 0xFF3EA5F2, 0xFF545454, 0xFF24323F, 0xFF6888FC, 0xFF3C565C, 0xFF529023, 0xFFA6CD33, 0xFFFFFFFF, 0xFFF7E176, 0xFF574A38, 0xFF463C2D, 0xFF352D22, 0xFF231E17, 0xFF120F0C];
+		FlxG.camera.bgColor = bgColors[FlxRandom.intRanged(0, bgColors.length-1)];
 
 		// Prepare state holders
 		entities = new FlxTypedGroup<Entity>();
@@ -101,24 +101,10 @@ class PlayState extends GameState
 		// Load level objects
 		level.loadObjects(this);
 
-		/*add(teleports);
-		
-		add(enemies);
-		
-		add(decoration);
-
-		add(player);
-		
-		add(playerBullets);
-		
-		add(enemyBullets);*/
-		
 		add(entities);
 		
 		handlePlayerPosition();
 		
-		// add(collectibles);
-
 		// Add overlay tiles
 		add(level.overlayTiles);
 
@@ -226,7 +212,7 @@ class PlayState extends GameState
 			FlxG.overlap(playerBullets, enemies, onBulletEnemyCollision);
 			
 			// PlayerBullets vs Decoration
-			FlxG.overlap(playerBullets, decoration, onBulletDecorationCollision);
+			// FlxG.overlap(playerBullets, decoration, onBulletDecorationCollision);
 			
 			// Player vs Enemies
 			FlxG.overlap(enemies, player, onEnemyCollision);
