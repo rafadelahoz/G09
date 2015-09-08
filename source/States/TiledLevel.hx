@@ -4,10 +4,11 @@ import haxe.io.Path;
 
 import flixel.FlxG;
 import flixel.FlxObject;
-import flixel.addons.editors.tiled.TiledMap;
-import flixel.addons.editors.tiled.TiledObject;
-import flixel.addons.editors.tiled.TiledObjectGroup;
-import flixel.addons.editors.tiled.TiledTileSet;
+import utils.tiled.TiledMap;
+import utils.tiled.TiledObject;
+import utils.tiled.TiledObjectGroup;
+import utils.tiled.TiledTileSet;
+import utils.tiled.TiledImage;
 import flixel.group.FlxGroup;
 import flixel.tile.FlxTilemap;
 import flixel.FlxSprite;
@@ -80,10 +81,8 @@ class TiledLevel extends TiledMap
 			else
 			{
 				backgroundTiles.add(tilemap);
-				
 			}
 		}
-
 	}
 
 	public function loadObjects(state : PlayState) : Void
@@ -119,6 +118,19 @@ class TiledLevel extends TiledMap
 		/** Collectibles **/
 		
 		/** Elements **/
+			case "solid":
+				var gid = o.gid;
+				var tiledImage : TiledImage = getImageSource(gid);
+				if (tiledImage == null)
+				{
+					trace("Could not locate image source for gid=" + gid + "!");
+				}
+				else
+				{
+					var decoration : Decoration = new Decoration(x, y, state, tiledImage);
+					state.decoration.add(decoration);
+				}
+				
 			case "teleport":
 				var target = o.custom.get("target");
 				var name = o.name;
@@ -139,6 +151,13 @@ class TiledLevel extends TiledMap
 				walker.hazardType = hazardType;
 				state.addEnemy(walker);*/
 		}
+	}
+	
+	function getImageSource(gid : Int) : TiledImage
+	{
+		var image : TiledImage = imageCollection.get(gid);
+		image.imagePath = "assets/tilesets/" + image.sourceImage;
+		return image;
 	}
 	
 	public function initEnemy(e : Enemy, o : TiledObject) : Void

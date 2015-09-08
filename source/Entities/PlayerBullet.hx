@@ -37,6 +37,11 @@ class PlayerBullet extends Entity
 		super.update();
 	}
 	
+	public function onCollisionWithDecoration(decoration : Decoration)
+	{
+		kill();
+	}
+	
 	public function onCollisionWithEnemy(enemy : Enemy)
 	{
 		kill();

@@ -122,9 +122,11 @@ class Player extends Entity
 
 			flipX = (facing == FlxObject.LEFT);
 		}
-			
+		
+		baseline = y + height;
+	
 		super.update();
-
+		
 		shadow.x = getMidpoint().x - shadow.width / 2;
 		shadow.y = y + height - shadow.height / 2;
 		shadow.update();

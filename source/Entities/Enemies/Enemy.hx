@@ -24,6 +24,8 @@ class Enemy extends Entity
 			brain.update();
 			
 		super.update();
+		
+		baseline = y + height;
 	}
 	
 	public function onCollisionWithPlayerBullet(bullet : PlayerBullet)

@@ -1,7 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="20" tilewidth="8" tileheight="8" nextobjectid="5">
- <tileset firstgid="1" name="tiles" tilewidth="8" tileheight="8">
-  <image source="../tilesets/tiles.png" trans="ff00ff" width="16" height="8"/>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="20" tilewidth="8" tileheight="8" nextobjectid="6">
+ <tileset firstgid="1" name="tiles" tilewidth="8" tileheight="8" tilecount="4">
+  <image source="../tilesets/tiles.png" trans="ff00ff" width="32" height="8"/>
+ </tileset>
+ <tileset firstgid="5" name="Decoration" tilewidth="32" tileheight="48" tilecount="3">
+  <tile id="0">
+   <properties>
+    <property name="mask" value="16,16"/>
+    <property name="maskOffset" value="8,24"/>
+    <property name="offset" value="8,32"/>
+    <property name="size" value="16,16"/>
+   </properties>
+   <image width="32" height="48" source="../tilesets/cactus.png"/>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="mask" value="16,16"/>
+    <property name="maskOffset" value="8,24"/>
+    <property name="offset" value="8,32"/>
+    <property name="size" value="16,16"/>
+   </properties>
+   <image width="32" height="48" source="../tilesets/othercactus.png"/>
+  </tile>
+  <tile id="2">
+   <image width="32" height="8" source="../tilesets/tiles.png"/>
+  </tile>
  </tileset>
  <layer name="Background" width="60" height="20">
   <properties>
@@ -38,7 +61,7 @@
   </data>
  </layer>
  <objectgroup color="#55aaff" name="Things">
-  <object id="1" type="Start" x="208" y="80" width="16" height="16">
+  <object id="1" type="Start" x="312" y="56" width="16" height="16">
    <ellipse/>
   </object>
   <object id="2" name="w0m0e-w0m1w" type="teleport" x="472" y="48" width="8" height="80">
@@ -51,5 +74,7 @@
     <property name="target" value="w0m1"/>
    </properties>
   </object>
+  <object id="5" type="solid" gid="5" x="240" y="96" width="32" height="48"/>
+  <object id="7" type="solid" gid="5" x="344" y="56" width="32" height="48"/>
  </objectgroup>
 </map>
