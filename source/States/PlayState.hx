@@ -14,6 +14,8 @@ import flixel.util.FlxPoint;
 import flixel.util.FlxRect;
 import flixel.util.FlxSort;
 import flixel.util.FlxRandom;
+import flixel.addons.display.FlxGridOverlay;
+
 using flixel.util.FlxSpriteUtil;
 
 /**
@@ -28,6 +30,7 @@ class PlayState extends GameState
 	var playflowManager : PlayFlowManager;
 	var camera : FlxCamera;
 	// var gui : GUI;
+	var grid : FlxSprite;
 	
 	/* Entities lists */
 	public var player : Player;
@@ -108,6 +111,11 @@ class PlayState extends GameState
 		// Add overlay tiles
 		add(level.overlayTiles);
 
+		// Debug grid thing
+		/*grid = FlxGridOverlay.create(16, 16, level.fullWidth, level.fullHeight);
+		grid.alpha = 0.5;
+		add(grid);*/
+		
 		// Set the camera to follow the player
 		if (player != null)
 			FlxG.camera.follow(player, FlxCamera.STYLE_TOPDOWN, null, 0);
@@ -189,6 +197,9 @@ class PlayState extends GameState
 			
 			// Player vs Decoration
 			FlxG.collide(decoration, player);
+			
+			// Enemies vs Decoration
+			FlxG.collide(decoration, enemies);
 			
 			// Player vs Teleports
 			FlxG.overlap(teleports, player, onTeleportCollision);

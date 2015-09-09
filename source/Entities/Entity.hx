@@ -61,7 +61,7 @@ class Entity extends FlxSprite
 	override public function draw()
 	{
 		super.draw();
-		dbgBaseline.draw();
+		// dbgBaseline.draw();
 	}
 	
 	public function freeze() : Void

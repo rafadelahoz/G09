@@ -12,9 +12,9 @@ class Player extends Entity
 	public var WalkVSpeed : Float = 65;
 	public var WalkVAcceleration : Float = 450;
 	
-	public var RollDuration : Float = 0.4;
-	public var RollHSpeed : Float = 100;
-	public var RollVSpeed : Float = 80;
+	public var RollDuration : Float = 0.3;
+	public var RollHSpeed : Float = 110;
+	public var RollVSpeed : Float = 90;
 
 	var shooterComponent : ShooterComponent;
 	var timer : FlxTimer;

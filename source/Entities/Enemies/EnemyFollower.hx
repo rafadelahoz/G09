@@ -1,31 +1,22 @@
 package;
 
-import flixel.FlxObject;
-import flixel.text.FlxText;
-import flixel.util.FlxTimer;
-import flixel.util.FlxVelocity;
-
-using flixel.util.FlxSpriteUtil;
-
-class EnemyWalker extends Enemy
+class EnemyFollower extends Enemy
 {
 	public var HurtTime : Float = 0.34;
 	
-	public var Acceleration : Float = 750;
-	public var MaxHSpeed : Float = 70;
-	public var MaxVSpeed : Float = 57;
+	public var Acceleration : Float = 700;
+	public var MaxHSpeed : Float = 75;
+	public var MaxVSpeed : Float = 60;
 
 	public var display : FlxText;
 	
 	public var flickering : Bool;
-	public var direction : Int;
 	
 	public function new(X : Float, Y : Float, World : PlayState)
 	{
 		super(X, Y, World);
 	
-		makeGraphic(16, 20, 0xFF208805);
-		
+		makeGraphic(16, 20, 0xFF200588);
 		display = new FlxText(x, y, "");
 		display.color = 0xFF000000;
 	}
@@ -37,19 +28,14 @@ class EnemyWalker extends Enemy
 		hp = 2;
 		flickering = false;
 		
-		direction = chooseDirection();
-		
-		setSize(16, 16);
-		offset.set(0, 4);
-		
-		maxVelocity.set(MaxHSpeed, MaxVSpeed);
-		
 		brain = new StateMachine(null, onStateChange);
 		brain.transition(moveState, "move");
 	}
 	
 	override public function update()
 	{
+		super.update();
+		
 		shadow.x = getMidpoint().x - shadow.width / 2;
 		shadow.y = y + height - shadow.height / 2;
 		shadow.update();
@@ -57,8 +43,6 @@ class EnemyWalker extends Enemy
 		display.x = x;
 		display.y = y - 8;
 		display.text = "HP: " + hp;
-		
-		super.update();
 		
 		display.update();
 	}
@@ -77,7 +61,6 @@ class EnemyWalker extends Enemy
 				
 					if (!dead && !stunned)
 					{
-						direction = chooseDirection();
 						brain.transition(moveState, "move");
 					}
 					else if (!dead && stunned)
@@ -88,73 +71,12 @@ class EnemyWalker extends Enemy
 		}
 	}
 	
-	static function isHorizontalDirection(direction : Int) : Bool
-	{
-		return (direction == FlxObject.LEFT || direction == FlxObject.RIGHT);
-	}
-	
-	function chooseDirection() : Int
-	{
-		// Check whether we are closer vertically or horizontally
-		// Horizontal distance is biased because of perspective
-		if (Math.abs(player.getMidpoint().y - getMidpoint().y) > 
-			Math.abs(player.getMidpoint().x - getMidpoint().x) * 0.7)
-		{
-			return chooseHorizontalDirection();
-		}
-		else
-		{
-			return chooseVerticalDirection();
-		}
-	}
-	
-	function chooseHorizontalDirection() : Int
-	{
-		if (player.getMidpoint().x < getMidpoint().x)
-			return FlxObject.LEFT;
-		else
-			return FlxObject.RIGHT;
-	}
-	
-	function chooseVerticalDirection() : Int
-	{
-		if (player.getMidpoint().y < getMidpoint().y)
-			return FlxObject.UP;
-		else
-			return FlxObject.DOWN;
-	}
-	
 	public function moveState()
 	{
 		immovable = false;
+		FlxVelocity.accelerateTowardsObject(this, world.player, Acceleration, MaxHSpeed, MaxVSpeed);
 		
-		if (justTouched(direction))
-		{
-			// Turn!
-			if (isHorizontalDirection(direction))
-				direction = chooseVerticalDirection();
-			else
-				direction = chooseHorizontalDirection();
-		}
-		else
-		{
-			// velocity.set();
-			acceleration.set();
-			
-			switch (direction)
-			{
-				case FlxObject.LEFT:
-					facing = FlxObject.LEFT;
-					acceleration.x = -Acceleration;
-				case FlxObject.RIGHT:
-					facing = FlxObject.RIGHT;
-					acceleration.x = Acceleration;
-				case FlxObject.UP:
-					acceleration.y = -Acceleration;
-				case FlxObject.DOWN:
-					acceleration.y = Acceleration;
-			}
-		}
+		drag.set();
 	}
 	
 	public function hitState()

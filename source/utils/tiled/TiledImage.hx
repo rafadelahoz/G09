@@ -72,7 +72,6 @@ class TiledImage
 			var size : Pair = parsePair(properties.get("size"));
 			width = size.x;
 			height = size.y;
-			trace("Size: " + size);
 		}
 		
 		if (properties.contains("offset"))
@@ -80,7 +79,6 @@ class TiledImage
 			var offset : Pair = parsePair(properties.get("offset"));
 			offsetX = offset.x;
 			offsetY = offset.y;
-			trace("Offset: " + offset);
 		}
 		
 		if (properties.contains("mask"))
@@ -88,7 +86,6 @@ class TiledImage
 			var maskSize : Pair = parsePair(properties.get("mask"));
 			maskWidth = maskSize.x;
 			maskHeight = maskSize.y;
-			trace("Mask: " + maskSize);
 		}
 		
 		if (properties.contains("maskOffset"))
@@ -96,7 +93,6 @@ class TiledImage
 			var maskOffset : Pair = parsePair(properties.get("maskOffset"));
 			maskOffsetX = maskOffset.x;
 			maskOffsetY = maskOffset.y;
-			trace("Mask offset: " + maskOffset);
 		}
 	}
 	

@@ -2,7 +2,7 @@ package;
 
 class StateMachine
 {
-	var activeState : Void -> Void;
+	public var activeState : Void -> Void;
 	var onStateChange : String -> Void;
 
 	public function new(?InitState : Void -> Void, ?OnStateChange : String -> Void)
