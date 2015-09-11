@@ -4,25 +4,41 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxSubState;
 import flixel.text.FlxText;
+import flixel.addons.text.FlxBitmapFont;
 import flixel.util.FlxRandom;
-
+import flixel.group.FlxSpriteGroup;
+import flixel.tweens.FlxEase;
+import flixel.tweens.FlxTween;
 
 class PauseMenu extends FlxSubState
 {
-	var text : FlxText;
+	var group : FlxSpriteGroup;
+	var text : FlxBitmapFont;
+	var bg : FlxSprite;
 	
 	public function new()
 	{
 		super(0x00000000);
 		
-		var bg : FlxSprite = new FlxSprite(FlxG.width / 2 - 40, FlxG.height / 4 - 2).makeGraphic(80, 32, 0x99000000);
-		text = new FlxText(FlxG.width / 2 - 32, FlxG.height / 4, 64, 		" ~ PAUSED! ~ ", 8);
+		group = new FlxSpriteGroup(0, FlxG.height);
+		
+		bg = new FlxSprite(0, 0).makeGraphic(FlxG.width, FlxG.height, 0xFF000000);
+		
+		text = new FlxBitmapFont(GameConstants.Font, 8, 8, FlxBitmapFont.TEXT_SET1, 16);
+		text.x = FlxG.width / 2 - 32;
+		text.y = FlxG.height / 4;
+		text.text = " ~ PAUSED! ~ ";
 		
 		bg.scrollFactor.set();
 		text.scrollFactor.set();
+		group.scrollFactor.set();
 		
-		add(bg);
-		add(text);
+		group.add(bg);
+		group.add(text);
+		
+		add(group);
+		
+		FlxTween.tween(group, {y: 0}, 0.5, { ease: FlxEase.bounceOut });
 		
 		add(GamePad.virtualPad);
 		
@@ -42,11 +58,11 @@ class PauseMenu extends FlxSubState
 	{
 		GamePad.handlePadState();
 		
-		text.color = FlxRandom.color();
-	
 		if (GamePad.justReleased(GamePad.Start))
 		{
-			close();
+			FlxTween.tween(group, {y: FlxG.height}, 0.5, { ease: FlxEase.bounceOut, complete: function(_t:FlxTween) {
+				close();
+			}});
 		}
 	
 		super.update();

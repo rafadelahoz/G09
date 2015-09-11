@@ -34,7 +34,7 @@ class GamefileState extends GameState
 		options = new Array<Option>();
 		
 		var saveslots : Array<String> = GameController.SAVESLOTS;
-		var savesdata : Map<String, GameController.GameStatusData> = GameController.checkSavefiles();
+		var savesdata : Map<String, GameStatusManager.Data> = GameController.checkSavefiles();
 		
 		var slotX : Int = 16;
 		var slotY : Int = 32;
@@ -254,11 +254,11 @@ class Option extends FlxSprite
 class GameFile extends Option
 {
 	public var slotName : String;
-	var data : GameController.GameStatusData;
+	var data : GameStatusManager.Data;
 	var dataText : String;
 	var tween : FlxTween;
 	
-	public function new(X : Float, Y : Float, Name : String, Slotname : String, Data : GameController.GameStatusData)
+	public function new(X : Float, Y : Float, Name : String, Slotname : String, Data : GameStatusManager.Data)
 	{
 		super(X, Y, Name);
 
@@ -275,7 +275,7 @@ class GameFile extends Option
 		focused = false;
 	}
 	
-	static function prepareDataDisplay(name : String, data : GameController.GameStatusData) : FlxText
+	static function prepareDataDisplay(name : String, data : GameStatusManager.Data) : FlxText
 	{
 		var text : FlxText = new FlxText();
 		

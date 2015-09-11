@@ -41,6 +41,7 @@
 	<classpath name="source/States" />
 	<classpath name="source/Effects" />
 	<classpath name="source/Entities" />
+	<classpath name="source/Entities/Items" />
 	<classpath name="source/Entities/Decoration" />
 	<classpath name="source/Entities/Enemies" />
 	

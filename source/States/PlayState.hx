@@ -29,7 +29,7 @@ class PlayState extends GameState
 	/* General elements */
 	var playflowManager : PlayFlowManager;
 	var camera : FlxCamera;
-	// var gui : GUI;
+	var gui : GUI;
 	var grid : FlxSprite;
 	
 	/* Entities lists */
@@ -45,7 +45,7 @@ class PlayState extends GameState
 	
 	public var enemyBullets : FlxGroup;
 	
-	// public var collectibles : FlxTypedGroup<Collectible>;
+	public var collectibles : FlxTypedGroup<Collectible>;
 	
 	public var decoration : FlxTypedGroup<Decoration>;
 	public var teleports : FlxTypedGroup<Teleport>;
@@ -58,7 +58,7 @@ class PlayState extends GameState
 		super();
 
 		if (Level == null)
-			Level = "" + GameController.GameStatus.currentMap;
+			Level = "" + GameStatusManager.Status.currentMap;
 
 		mapName = Level;
 	}
@@ -88,7 +88,7 @@ class PlayState extends GameState
 		
 		enemyBullets = new FlxGroup();
 
-		// collectibles = new FlxTypedGroup<Collectible>();
+		collectibles = new FlxTypedGroup<Collectible>();
 		teleports = new FlxTypedGroup<Teleport>();
 		
 		decoration = new FlxTypedGroup<Decoration>();
@@ -121,8 +121,8 @@ class PlayState extends GameState
 			FlxG.camera.follow(player, FlxCamera.STYLE_TOPDOWN, null, 0);
 
 		// Add the GUI
-		/*gui = new GUI();
-		add(gui);*/
+		gui = new GUI();
+		add(gui);
 			
 		// Prepare death manager
 		playflowManager = PlayFlowManager.get(this/*, gui*/);
@@ -158,11 +158,11 @@ class PlayState extends GameState
 		decoration.destroy();
 		decoration = null;
 		
-		/*collectibles.destroy();
-		collectibles = null;*/
+		collectibles.destroy();
+		collectibles = null;
 		
-		/*gui.destroy();
-		gui = null;*/
+		gui.destroy();
+		gui = null;
 
 		playflowManager.destroy();
 		playflowManager = null;
@@ -217,7 +217,7 @@ class PlayState extends GameState
 			entities.callAll("setCollisionMask");
 			
 			// Player vs Collectibles
-			// FlxG.overlap(collectibles, player, onCollectibleCollision);
+			FlxG.overlap(collectibles, player, onCollectibleCollision);
 			
 			// PlayerBullets vs Enemies
 			FlxG.overlap(playerBullets, enemies, onBulletEnemyCollision);
@@ -348,11 +348,11 @@ class PlayState extends GameState
 			trace("NO COLL");
 	}
 
-	/*public function onCollectibleCollision(collectible : Collectible, pen : Player)
+	public function onCollectibleCollision(collectible : Collectible, player : Player)
 	{
-		collectible.onCollisionWithPlayer(pen);
+		collectible.onCollisionWithPlayer(player);
 		// Don't notify the player for now
-	}*/
+	}
 	
 	public function onTeleportCollision(teleport : Teleport, player : Player)
 	{
@@ -362,8 +362,8 @@ class PlayState extends GameState
 		
 		var pos : FlxPoint = teleport.computePosition(player.getMidpoint());		
 		
-		GameController.GameStatus.lastTeleport = teleport.getData();
-		GameController.GameStatus.lastTeleport.position = pos;
+		GameStatusManager.Status.lastTeleport = teleport.getData();
+		GameStatusManager.Status.lastTeleport.position = pos;
 		
 		GameController.Teleport();
 	}
@@ -388,7 +388,7 @@ class PlayState extends GameState
 	
 	public function handlePlayerPosition()
 	{
-		var lastTeleportData : Teleport.TeleportData = GameController.GameStatus.lastTeleport;
+		var lastTeleportData : Teleport.TeleportData = GameStatusManager.Status.lastTeleport;
 		if (lastTeleportData != null)
 		{
 			// Locate the actual teleport
@@ -414,9 +414,12 @@ class PlayState extends GameState
 		
 		if (FlxG.mouse.justPressed)
 		{
-			var enemy : Enemy = new EnemyWalker(mousePos.x, mousePos.y, this);
+			/*var enemy : Enemy = new EnemyWalker(mousePos.x, mousePos.y, this);
 			enemy.init(0);
-			addEnemy(enemy);
+			addEnemy(enemy);*/
+			
+			var coin : Coin = new Coin(mousePos.x, mousePos.y, this);
+			collectibles.add(coin);
 		}
 		
 		if (FlxG.keys.anyJustPressed(["T"]))

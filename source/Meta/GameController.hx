@@ -10,8 +10,6 @@ class GameController
 	public static var SAVESLOT = "SAVE0";
 
 	private static var gameSave : FlxSave;
-
-	public static var GameStatus : GameStatusData;
 	
 	/** Game Management API **/
 	public static function ToTitleScreen()
@@ -26,14 +24,14 @@ class GameController
 	
 	public static function StartGame()
 	{
-		FlxG.switchState(new PlayState(GameStatus.currentMap));
+		FlxG.switchState(new PlayState(GameStatusManager.Status.currentMap));
 	}
 	
 	public static function Teleport()
 	{
-		GameStatus.currentMap = GameStatus.lastTeleport.target;
+		GameStatusManager.Status.currentMap = GameStatusManager.Status.lastTeleport.target;
 	
-		FlxG.switchState(new PlayState(GameStatus.currentMap));
+		FlxG.switchState(new PlayState(GameStatusManager.Status.currentMap));
 	}
 	
 	/** Status handling functions **/
@@ -61,16 +59,12 @@ class GameController
 	{
 		gameSave = new FlxSave();
 		
-		GameStatus = {
-			currentMap: "w0m0",
-			lastTeleport: null,
-			coins: 0
-		};
+		GameStatusManager.Init();
 	}
 	
-	public static function checkSavefiles() : Map<String, GameStatusData>
+	public static function checkSavefiles() : Map<String, GameStatusManager.Data>
 	{
-		var savefilesMap : Map<String, GameStatusData> = new Map<String, GameStatusData>();
+		var savefilesMap : Map<String, GameStatusManager.Data> = new Map<String, GameStatusManager.Data>();
 		
 		for (saveslot in SAVESLOTS)
 		{
@@ -80,11 +74,11 @@ class GameController
 		return savefilesMap;
 	}
 	
-	public static function checkSaveslot(slot : String) : GameStatusData
+	public static function checkSaveslot(slot : String) : GameStatusManager.Data
 	{
 		gameSave.bind(slot);
 		
-		var data : GameStatusData = gameSave.data.gameStatus;
+		var data : GameStatusManager.Data = gameSave.data.gameStatus;
 		gameSave.destroy();
 		return data;
 	}
@@ -100,7 +94,7 @@ class GameController
 	{
 		
 		gameSave.bind(SAVESLOT);
-		gameSave.data.gameStatus = GameStatus;
+		gameSave.data.gameStatus = GameStatusManager.Status;
 		trace("Saving " + gameSave.data);
 		gameSave.close();
 	}
@@ -114,17 +108,10 @@ class GameController
 		}
 		else 
 		{
-			GameStatus = gameSave.data.gameStatus;
+			GameStatusManager.Status = gameSave.data.gameStatus;
 			trace("Loaded: " + gameSave.data);
 		}
 	}
 	
 	/** Data parsing **/
-}
-
-
-typedef GameStatusData = { 
-	currentMap: String,
-	lastTeleport: Teleport.TeleportData,
-	coins: Int
 }
