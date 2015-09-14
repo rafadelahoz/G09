@@ -24,7 +24,14 @@ class EnemyWalker extends Enemy
 	{
 		super(X, Y, World);
 	
-		makeGraphic(16, 20, 0xFF208805);
+		// makeGraphic(16, 20, 0xFF208805);
+		loadGraphic("assets/images/walker-sheet.png", true, 32, 32);
+		animation.add("walk", [0, 1], 8);
+		animation.add("hurt", [2]);
+		animation.play("walk");
+
+		setSize(16, 24);
+		offset.set(8, 7);
 		
 		display = new FlxText(x, y, "");
 		display.color = 0xFF000000;
@@ -38,10 +45,7 @@ class EnemyWalker extends Enemy
 		flickering = false;
 		
 		direction = chooseDirection();
-		
-		setSize(16, 16);
-		offset.set(0, 4);
-		
+
 		maxVelocity.set(MaxHSpeed, MaxVSpeed);
 		
 		brain = new StateMachine(null, onStateChange);
@@ -49,16 +53,16 @@ class EnemyWalker extends Enemy
 	}
 	
 	override public function update()
-	{
+	{	
+		/*display.x = x;
+		display.y = y - 8;
+		display.text = "HP: " + hp;*/
+		
+		super.update();
+
 		shadow.x = getMidpoint().x - shadow.width / 2;
 		shadow.y = y + height - shadow.height / 2;
 		shadow.update();
-		
-		display.x = x;
-		display.y = y - 8;
-		display.text = "HP: " + hp;
-		
-		super.update();
 		
 		display.update();
 	}
@@ -155,12 +159,20 @@ class EnemyWalker extends Enemy
 					acceleration.y = Acceleration;
 			}
 		}
+
+		animation.play("walk");
+		if (facing == FlxObject.LEFT)
+			flipX = true;
+		else
+			flipX = false;
 	}
 	
 	public function hitState()
 	{
 		immovable = true;
 		drag.set(1000, 1000);
+
+		animation.play("hurt");
 	}
 	
 	public function stunState()
@@ -169,6 +181,8 @@ class EnemyWalker extends Enemy
 		
 		immovable = true;
 		drag.set(1000, 1000);
+
+		animation.play("hurt");
 	}
 	
 	override public function onStun()
@@ -202,6 +216,6 @@ class EnemyWalker extends Enemy
 	{
 		shadow.draw();
 		super.draw();
-		display.draw();
+		// display.draw();
 	}
 }

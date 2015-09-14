@@ -421,6 +421,19 @@ class PlayState extends GameState
 			var coin : Coin = new Coin(mousePos.x, mousePos.y, this);
 			collectibles.add(coin);
 		}
+
+		if (FlxG.keys.justPressed.ONE) 
+		{
+			var enemy : Enemy = new EnemyWalker(mousePos.x, mousePos.y, this);
+			enemy.init(0);
+			addEnemy(enemy);
+		} 
+		else if (FlxG.keys.justReleased.TWO) 
+		{
+			var enemy : Enemy = new EnemyFollower(mousePos.x, mousePos.y, this);
+			enemy.init(0);
+			addEnemy(enemy);
+		}
 		
 		if (FlxG.keys.anyJustPressed(["T"]))
 		{

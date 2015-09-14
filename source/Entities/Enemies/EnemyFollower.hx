@@ -1,5 +1,12 @@
 package;
 
+import flixel.FlxObject;
+import flixel.text.FlxText;
+import flixel.util.FlxTimer;
+import flixel.util.FlxVelocity;
+
+using flixel.util.FlxSpriteUtil;
+
 class EnemyFollower extends Enemy
 {
 	public var HurtTime : Float = 0.34;
@@ -16,7 +23,14 @@ class EnemyFollower extends Enemy
 	{
 		super(X, Y, World);
 	
-		makeGraphic(16, 20, 0xFF200588);
+		loadGraphic("assets/images/follower-sheet.png", true, 16, 24);
+		animation.add("move", [0, 1], 8);
+		animation.add("hurt", [2]);
+		animation.play("move");
+		
+		setSize(10, 8);
+		offset.set(3, 15);
+
 		display = new FlxText(x, y, "");
 		display.color = 0xFF000000;
 	}
@@ -77,12 +91,17 @@ class EnemyFollower extends Enemy
 		FlxVelocity.accelerateTowardsObject(this, world.player, Acceleration, MaxHSpeed, MaxVSpeed);
 		
 		drag.set();
+
+		animation.play("move");
+		flipX = (acceleration.x < 0);
 	}
 	
 	public function hitState()
 	{
 		immovable = true;
 		drag.set(1000, 1000);
+
+		animation.play("hurt");
 	}
 	
 	public function stunState()
@@ -91,6 +110,8 @@ class EnemyFollower extends Enemy
 		
 		immovable = true;
 		drag.set(1000, 1000);
+
+		animation.play("hurt");
 	}
 	
 	override public function onStun()
@@ -124,6 +145,6 @@ class EnemyFollower extends Enemy
 	{
 		shadow.draw();
 		super.draw();
-		display.draw();
+		// display.draw();
 	}
 }
