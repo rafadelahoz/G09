@@ -30,6 +30,8 @@ class Collectible extends Entity
 		if (scale.x <= 0) kill();
 		
 		super.update();
+		
+		baseline = y + height;
 	}
 	
 	// This is to be overidden

@@ -12,18 +12,31 @@ class Coin extends Collectible
 		super(X, Y, World);
 		
 		value = Value;
-		
-		loadGraphic("assets/images/coin-sheet.png", true, 8, 8);
-		animation.add("idle", [0, 1, 2, 3, 4, 0, 4], 5);
-		animation.play("idle");
 
-		shadow = new FlxSprite(x, baseline).loadGraphic("assets/images/shadow-small.png");
+		shadow = new FlxSprite(x, baseline);
+		
+		if (value > 5)
+		{
+			loadGraphic("assets/images/purse-sheet.png", true, 16, 16);	
+			animation.add("idle", [0]);
+
+			shadow.loadGraphic("assets/images/shadow-small.png");
+		}
+		else
+		{
+			loadGraphic("assets/images/coin-sheet.png", true, 8, 8);
+			animation.add("idle", [0, 1, 2, 3, 4, 0, 4], 5);	
+			shadow.loadGraphic("assets/images/shadow.png");
+		}
+
 		shadow.solid = false;
+
+		animation.play("idle");
 	}
 
 	override public function onCollected() : Void
 	{
-		GameStatusManager.Status.coins += value;
+		GameStatusManager.addCoins(value);
 		
 		super.onCollected();
 	}

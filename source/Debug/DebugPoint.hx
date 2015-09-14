@@ -11,7 +11,7 @@ import flixel.util.FlxTimer;
 
 class DebugPoint extends FlxSprite
 {
-	public function new(X : Int, Y : Int)
+	public function new(X : Float, Y : Float)
 	{
 		super(X, Y);
 		makeGraphic(2, 2, 0xFFFF00FF);

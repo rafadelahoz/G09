@@ -116,10 +116,11 @@ class EnemyFollower extends Enemy
 	
 	override public function onStun()
 	{
+		super.onStun();
 		brain.transition(stunState, "stun");
 	}
 	
-	override public function onCollisionWithPlayerBullet(bullet : PlayerBullet)
+	override public function onBulletHit(bullet : PlayerBullet)
 	{
 		if (!dead/* && !flickering*/)
 		{
