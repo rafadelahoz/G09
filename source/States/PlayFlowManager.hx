@@ -12,20 +12,18 @@ using flixel.util.FlxSpriteUtil;
 class PlayFlowManager extends FlxObject
 {
 	static var instance : PlayFlowManager;
-	public static function get(?World : PlayState = null/*, ?Gui : GUI = null*/) : PlayFlowManager
+	public static function get(?World : PlayState = null) : PlayFlowManager
 	{
 		// There is no instance: create one
 		if (instance == null)
 		{
-			instance = new PlayFlowManager(World/*, Gui*/);
+			instance = new PlayFlowManager(World);
 		}
 		// There is a former instance, update references
 		else 
 		{
 			if (World != null)
 				instance.world = World;
-			/*if (Gui != null)
-				instance.gui = Gui;*/
 		}
 		
 		return instance;
@@ -36,10 +34,6 @@ class PlayFlowManager extends FlxObject
 	public var paused : Bool;
 	public var group : FlxGroup;
 	
-	/*var gui : GUI;*/
-	
-	var pauseGUI : FlxGroup;
-
 	public function new(?World : PlayState/*, ?Gui : GUI*/)
 	{
 		super();
@@ -50,19 +44,6 @@ class PlayFlowManager extends FlxObject
 		}
 		
 		create();
-		
-		/*if (Gui != null)
-		{
-			gui = Gui;
-			group.add(gui);
-		}*/
-		
-		pauseGUI = new FlxGroup();
-		pauseGUI.add(new FlxSprite(FlxG.width / 2 - 40, FlxG.height / 4 - 2).makeGraphic(80, 32, 0x99000000));
-		pauseGUI.add(new FlxText(FlxG.width / 2 - 32, FlxG.height / 4, 64, 		" ~ PAUSED! ~ ", 8));
-		pauseGUI.add(new FlxText(FlxG.width / 2 - 32, FlxG.height / 4 + 16, 64, "A: Exit level", 8));
-		pauseGUI.setAll("scrollFactor", new FlxPoint(0, 0));
-		group.add(pauseGUI);
 	}
 
 	override public function destroy() : Void
@@ -91,9 +72,6 @@ class PlayFlowManager extends FlxObject
 	{
 		if (paused)
 		{
-			/* Update the GUI */
-			/*gui.updateGUI(world.icecream, world);*/
-			
 			group.update();
 			super.update();
 			
@@ -147,7 +125,6 @@ class PlayFlowManager extends FlxObject
 	
 	public function doPause(silent : Bool = false) : Void
 	{
-		pauseGUI.visible = !silent;
 		canResume = !silent;
 	
 		paused = true;
@@ -163,8 +140,6 @@ class PlayFlowManager extends FlxObject
 		if (!canResume && !force)
 			return;
 	
-		pauseGUI.visible = false;
-		
 		paused = false;
 		
 		for (entity in world.entities)

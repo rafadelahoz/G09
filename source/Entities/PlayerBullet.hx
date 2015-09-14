@@ -3,19 +3,34 @@ package;
 import flixel.FlxG;
 import flixel.FlxObject;
 
-enum BulletType { Pistol; Blaster; }
+enum BulletType { Pistol; Blaster; Melon; Net; }
 
 class PlayerBullet extends Entity
 {
-	var type : BulletType;
+	public var type : BulletType;
+	public var power : Int;
 	
 	public function new(X : Float, Y : Float, World : PlayState, Type : BulletType)
 	{
 		super(X, Y, World);
 		
-		makeGraphic(10, 6, 0xFFE1E1E1);
-		
 		type = Type;
+		
+		switch (type)
+		{
+			case Pistol:
+				makeGraphic(10, 6, 0xFFEDEDED);
+				power = 1;
+			case Blaster:
+				makeGraphic(10, 8, 0xFFFFDDDD);
+				power = 1;
+			case Melon:
+				makeGraphic(12, 12, 0xFF90D49A);
+				power = 2;
+			case Net:
+				makeGraphic(14, 14, 0xFFD4BC90);
+				power = 1;
+		}
 	}
 	
 	public function init(X : Int, Y : Int, HSpeed : Float, VSpeed : Float)
@@ -27,7 +42,7 @@ class PlayerBullet extends Entity
 		
 		velocity.set(HSpeed, VSpeed);
 
-		baseline = FlxG.height;
+		baseline = world.player.baseline;
 	}
 	
 	override public function update()

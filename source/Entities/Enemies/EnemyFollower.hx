@@ -1,5 +1,12 @@
 package;
 
+import flixel.FlxObject;
+import flixel.text.FlxText;
+import flixel.util.FlxTimer;
+import flixel.util.FlxVelocity;
+
+using flixel.util.FlxSpriteUtil;
+
 class EnemyFollower extends Enemy
 {
 	public var HurtTime : Float = 0.34;
@@ -95,10 +102,11 @@ class EnemyFollower extends Enemy
 	
 	override public function onStun()
 	{
+		super.onStun();
 		brain.transition(stunState, "stun");
 	}
 	
-	override public function onCollisionWithPlayerBullet(bullet : PlayerBullet)
+	override public function onBulletHit(bullet : PlayerBullet)
 	{
 		if (!dead/* && !flickering*/)
 		{

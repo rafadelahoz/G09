@@ -16,6 +16,8 @@ import flixel.util.FlxSort;
 import flixel.util.FlxRandom;
 import flixel.addons.display.FlxGridOverlay;
 
+import text.TextBox;
+
 using flixel.util.FlxSpriteUtil;
 
 /**
@@ -260,17 +262,17 @@ class PlayState extends GameState
 	{
 		var result:Int = 0;
 		
-		var Value1 : Float;
-		var Value2 : Float;
+		var Value1 : Float = 0;
+		var Value2 : Float = 0;
 		
 		if (Std.is(Obj1, Entity))
 			Value1 = cast(Obj1, Entity).baseline;
-		else 
+		else if (Std.is(Obj1, FlxObject))
 			Value1 = cast(Obj1, FlxObject).y + cast(Obj1, FlxObject).height;
 			
 		if (Std.is(Obj2, Entity))
 			Value2 = cast(Obj2, Entity).baseline;
-		else
+		else if (Std.is(Obj2, FlxObject))
 			Value2 = (cast Obj2).y + (cast Obj2).height;
 		
 		if (Value1 < Value2)
@@ -360,6 +362,8 @@ class PlayState extends GameState
 		
 		FlxObject.separate(teleport, player);
 		
+		GameStatusManager.PlayerStatus.facing = player.facing;
+		
 		var pos : FlxPoint = teleport.computePosition(player.getMidpoint());		
 		
 		GameStatusManager.Status.lastTeleport = teleport.getData();
@@ -402,6 +406,8 @@ class PlayState extends GameState
 				}
 			}
 		}
+		
+		player.facing = GameStatusManager.PlayerStatus.facing;
 	}
 	
 	function doDebug() : Void
@@ -420,6 +426,29 @@ class PlayState extends GameState
 			
 			var coin : Coin = new Coin(mousePos.x, mousePos.y, this);
 			collectibles.add(coin);
+		}
+		
+		if (FlxG.keys.justPressed.ONE)
+		{
+			var enemy : Enemy = new EnemyWalker(mousePos.x, mousePos.y, this);
+			enemy.init(0);
+			addEnemy(enemy);
+		}
+		else if (FlxG.keys.justPressed.TWO)
+		{
+			var enemy : Enemy = new EnemyFollower(mousePos.x, mousePos.y, this);
+			enemy.init(0);
+			addEnemy(enemy);
+		}
+		else if (FlxG.keys.justPressed.THREE)
+		{
+			var pkg : Package = new Package(mousePos.x - 8, mousePos.y - 16, this, "HURR!");
+			collectibles.add(pkg);
+		}
+		
+		if (FlxG.keys.pressed.O)
+		{
+			TextBox.Message("NPC", "When I find myself in times of trouble, Mother Mary comes to me speaking words of wisdom:\n-Let it be, let it be, let it be,\n oh~ let it be!\n There will be an answer, let it be~~");
 		}
 		
 		if (FlxG.keys.anyJustPressed(["T"]))

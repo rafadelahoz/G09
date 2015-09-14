@@ -12,12 +12,15 @@ class Coin extends Collectible
 		
 		value = Value;
 		
-		makeGraphic(10, 10, 0xFFffdd00);
+		if (value > 5)
+			makeGraphic(14, 14, 0xFFffee11);
+		else
+			makeGraphic(10, 10, 0xFFffdd00);
 	}
 	
 	override public function onCollected() : Void
 	{
-		GameStatusManager.Status.coins += value;
+		GameStatusManager.addCoins(value);
 		
 		super.onCollected();
 	}

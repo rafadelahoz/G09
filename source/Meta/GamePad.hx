@@ -55,14 +55,14 @@ class GamePad
 			virtualPad.buttonDown.status == FlxButton.PRESSED || FlxG.keys.anyPressed(["DOWN"]));
 			
 		currentPadState.set(A, 
-			virtualPad.buttonA.status == FlxButton.PRESSED || FlxG.keys.anyPressed(["A", "Z", "SPACE"]));
+			virtualPad.buttonA.status == FlxButton.PRESSED || FlxG.keys.anyPressed(["A", "Z"]));
 		currentPadState.set(B, 
-			virtualPad.buttonB.status == FlxButton.PRESSED || FlxG.keys.anyPressed(["S", "X", "CONTROL"]));
+			virtualPad.buttonB.status == FlxButton.PRESSED || FlxG.keys.anyPressed(["S", "X"]));
 		
 		currentPadState.set(Start, 
 			virtualPad.buttonStart.status == FlxButton.PRESSED || FlxG.keys.anyPressed(["ENTER"]));
 		currentPadState.set(Select, 
-			virtualPad.buttonSelect.status == FlxButton.PRESSED || FlxG.keys.anyPressed(["BACKSPACE"]));
+			virtualPad.buttonSelect.status == FlxButton.PRESSED || FlxG.keys.anyPressed(["SPACE"]));
 	}
 	
 	public static function checkButton(button : Int) : Bool

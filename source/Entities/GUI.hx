@@ -16,6 +16,7 @@ class GUI extends FlxTypedGroup<FlxSprite>
 	var topBackground : FlxSprite;
 	
 	var coinDisplayText : FlxBitmapFont;
+	var weaponDisplayText : FlxBitmapFont;
 
 	public function new()
 	{
@@ -27,6 +28,10 @@ class GUI extends FlxTypedGroup<FlxSprite>
 		coinDisplayText = new FlxBitmapFont(GameConstants.Font, 8, 8, FlxBitmapFont.TEXT_SET1, 16);
 		add(coinDisplayText);
 		
+		weaponDisplayText = new FlxBitmapFont(GameConstants.Font, 8, 8, FlxBitmapFont.TEXT_SET1, 16);
+		weaponDisplayText.x = FlxG.width - 64;
+		add(weaponDisplayText);
+		
 		// Scrollfactor.set()
 		forEach(function(spr : FlxSprite) {
 			spr.scrollFactor.set();
@@ -36,13 +41,36 @@ class GUI extends FlxTypedGroup<FlxSprite>
 	override public function update()
 	{
 		updateCoinDisplay();
+		updateWeaponDisplay();
 		
 		super.update();
 	}
 	
 	private function updateCoinDisplay()
 	{
-		// Not efficient! Update only when necessary!
-		coinDisplayText.text = "COINS: " + GameStatusManager.Status.coins;
+		var text = "COINS: " + GameStatusManager.Status.coins;
+		// Update only when necessary!
+		if (text != coinDisplayText.text)
+			coinDisplayText.text = text;
+	}
+	
+	private function updateWeaponDisplay()
+	{
+		var text : String = "";
+		switch (GameStatusManager.currentWeapon())
+		{
+			case Player.WPISTOL:
+				text += "PISTOL";
+			case Player.WBLASTER:
+				text += "BLASTER";
+			case Player.WMELON:
+				text += "MELON";
+			case Player.WNET:
+				text += "NET";
+		}
+		
+		// Update only when necessary!
+		if (text != weaponDisplayText.text)
+			weaponDisplayText.text = text;
 	}
 }

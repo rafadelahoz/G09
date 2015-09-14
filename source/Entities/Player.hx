@@ -7,6 +7,11 @@ import flixel.tweens.FlxTween;
 
 class Player extends Entity
 {
+	public static var WPISTOL 	: Int = 0x1;
+	public static var WBLASTER 	: Int = 0x2;
+	public static var WMELON 	: Int = 0x4;
+	public static var WNET 		: Int = 0x8;
+
 	public var WalkHSpeed : Float = 80;
 	public var WalkHAcceleration : Float = 800;
 	public var WalkVSpeed : Float = 65;
@@ -15,6 +20,8 @@ class Player extends Entity
 	public var RollDuration : Float = 0.3;
 	public var RollHSpeed : Float = 110;
 	public var RollVSpeed : Float = 90;
+	
+	public var MaxCarriedPackages : Int = 3;
 
 	var shooterComponent : ShooterComponent;
 	var timer : FlxTimer;
@@ -23,6 +30,12 @@ class Player extends Entity
 	var rolling : Bool;
 	var lastDirection : Int;
 	var rollSpeed : FlxPoint;
+	
+	public var carriedPackages : Int;
+	
+	/*var positionStoreDelay : Float = 1/50.0;
+	var positionTimer : FlxTimer;
+	public var pastPositions : Array<FlxPoint>;*/
 	
 	public function new(X : Int, Y : Int, World : PlayState)
 	{
@@ -43,7 +56,7 @@ class Player extends Entity
 		
 		// Pistol shooter component
 		shooterComponent = new ShooterComponent();
-		shooterComponent.init(world, 15, PlayerBullet.BulletType.Pistol);
+		initShooterComponent(GameStatusManager.currentWeapon());
 		
 		shooting = false;
 		rolling = false;
@@ -52,6 +65,12 @@ class Player extends Entity
 		timer = new FlxTimer();
 		
 		lastDirection = FlxObject.RIGHT;
+		
+		carriedPackages = 0;
+		/*pastPositions = new Array<FlxPoint>();
+		for (i in 0...(10 + MaxCarriedPackages * 2))
+			pastPositions.push(getMidpoint());
+		positionTimer = new FlxTimer(positionStoreDelay, storePosition, 0);*/
 	}
 	
 	override public function update()
@@ -108,6 +127,8 @@ class Player extends Entity
 				if (acceleration.x != 0)
 					acceleration.y = 0;
 					
+				handleWeapon();
+					
 				handleRolling();
 			}
 			
@@ -132,23 +153,58 @@ class Player extends Entity
 		shadow.update();
 	}
 
+	function handleWeapon() : Void
+	{
+		if (GamePad.justPressed(GamePad.Select))
+		{
+			var previousWeapon : Int = GameStatusManager.currentWeapon();
+			var currentWeapon : Int = GameStatusManager.switchWeapon();
+			if (currentWeapon != previousWeapon)
+			{
+				initShooterComponent(currentWeapon);
+			}
+		}
+	}
+	
+	function initShooterComponent(weapon : Int) : Void
+	{
+		var btype : PlayerBullet.BulletType = PlayerBullet.BulletType.Pistol;
+		
+		// Play sound, animation...?
+		
+		switch (weapon)
+		{
+			case Player.WPISTOL:
+				btype = PlayerBullet.BulletType.Pistol;
+			case Player.WBLASTER:
+				btype = PlayerBullet.BulletType.Blaster;
+			case Player.WMELON:
+				btype = PlayerBullet.BulletType.Melon;
+			case Player.WNET:
+				btype = PlayerBullet.BulletType.Net;
+		}
+		
+		shooterComponent.init(world, btype);
+	}
+	
 	function handleShooting() : Void
 	{
 		if (GamePad.justPressed(GamePad.B))
 		{
 			// Shoot!
-			shooterComponent.shoot(getShootpoint(), getTargetpoint());
-			
-			// And pause
-			acceleration.set();
-			velocity.set();
-			
-			// For a little while
-			shooting = true;
-			
-			timer.start(shooterComponent.getDelay(), function(_t:FlxTimer) {
-				shooting = false;
-			});
+			if (shooterComponent.shoot(getShootpoint(), getTargetpoint())) 
+			{
+				// And pause
+				acceleration.set();
+				velocity.set();
+				
+				// For a little while
+				shooting = true;
+				
+				timer.start(shooterComponent.getDelay(), function(_t:FlxTimer) {
+					shooting = false;
+				});
+			}
 		}
 	}
 	
@@ -226,4 +282,10 @@ class Player extends Entity
 		x = pos.x - width / 2;
 		y = pos.y - height / 2;
 	}
+	
+	/*public function storePosition(_t:FlxTimer)
+	{
+		pastPositions.shift();
+		pastPositions.push(getMidpoint());
+	}*/
 }
