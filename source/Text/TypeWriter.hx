@@ -153,6 +153,8 @@ class TypeWriter extends FlxText
 	
 	private var targetHeight : Int;
 	
+	private var targetLines : Int;
+	
 	private var remainingText : String;
 	
 	/**
@@ -171,8 +173,11 @@ class TypeWriter extends FlxText
 		super(X, Y, Width, "", Size, EmbeddedFont);
 		_finalText = Text;
 		
-		lineHeight = Size;
+		lineHeight = Size + 2;
 		targetHeight = TargetHeight;
+		targetLines = Std.int(targetHeight / lineHeight);
+		trace(targetHeight + "/" + lineHeight + "=" + targetLines);
+		// trace("Textbox with " + targetLines + " max lines");
 		
 		_onComplete = null;
 		_onErase = null;
@@ -565,7 +570,28 @@ class TypeWriter extends FlxText
 			text = helperString;
 			
 			// Check if there is more space available for lines
-			if (targetHeight > 0 && height + lineHeight > targetHeight && _length < _finalText.length)
+			// trace("lines: " + _textField.numLines);
+
+			var atValidWrapChar : Bool = false;
+			if (_textField.numLines == targetLines)
+			{
+				var lineWidth : Float = _textField.getLineMetrics(targetLines-1).width;
+				var lineText : String = _textField.getLineText(targetLines-1);
+				var remainer : String = _finalText.substring(_length - 1);
+				
+				if (lineWidth > 3*width/4 && validWrapChar(lineText.charAt(lineText.length-1)))
+				{
+					var nextChar : String = remainer.charAt(1);
+					// Only wrap if the next char is not wrappable!
+					if (!validWrapChar(nextChar))
+					{
+						atValidWrapChar = true;
+					}
+				}
+			}
+			
+			// if (targetHeight > 0 && height + lineHeight > targetHeight && _length < _finalText.length)
+			if (targetHeight > 0 && _length < _finalText.length && atValidWrapChar)
 			{
 				finished = true;
 
@@ -599,6 +625,11 @@ class TypeWriter extends FlxText
 		}
 		
 		super.update();
+	}
+	
+	static inline function validWrapChar(char : String) : Bool
+	{
+		return char == " " || char == "." || char == ",";
 	}
 	
 	/**

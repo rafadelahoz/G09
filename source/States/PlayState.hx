@@ -461,11 +461,12 @@ class PlayState extends GameState
 		
 		if (FlxG.keys.pressed.O)
 		{
-			TextBox.Message("NPC", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris varius felis sed nibh ullamcorper, eget vulputate diam consectetur. Pellentesque eget hendrerit sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aenean urna leo, iaculis a lacinia et, rhoncus vel leo. Aliquam posuere lorem nec tempor aliquet. Morbi et pellentesque diam, vitae vehicula sem. Nulla vel risus ut massa porttitor lacinia.\nQuisque viverra tellus ipsum. Maecenas in tempor sem. Aliquam at metus tincidunt, pellentesque diam non, ultrices nisl. Donec sagittis, nibh id vehicula suscipit, enim ipsum commodo quam, non placerat purus sem id lorem. Sed convallis leo arcu, eu accumsan neque accumsan id. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Pellentesque scelerisque tristique nulla eget tristique. Duis libero libero, molestie at risus et, eleifend mollis elit. Nulla blandit risus et efficitur rhoncus. Duis rhoncus lobortis ante, et vulputate nibh malesuada vel. Praesent erat est, efficitur ac scelerisque a, consectetur ac purus. Nam sagittis, diam eu mollis vestibulum, neque dui scelerisque dui, vel tempus velit lacus vel nisl. Vivamus accumsan euismod ultricies. Fusce tellus urna, posuere a congue non, imperdiet vitae tortor. Fusce vulputate, erat hendrerit gravida tincidunt, nisi tortor dapibus dolor, at accumsan orci dolor eget tellus.\nFusce et tempor diam, id efficitur ex. Mauris sit amet dolor felis. Mauris ac ultrices diam. Pellentesque semper sed lorem nec condimentum. Ut ornare, ligula nec fringilla condimentum, lorem odio facilisis metus, eu ultrices mauris dolor at lectus. Nulla sollicitudin lectus a posuere aliquam. Nam dignissim tincidunt convallis. Aliquam scelerisque nunc quis elit elementum hendrerit. Maecenas vel hendrerit libero. Pellentesque placerat condimentum lacus, a cursus metus efficitur non. Pellentesque sed vulputate ex. Nunc orci nunc, auctor malesuada ligula vitae, sodales pharetra risus.");
+			TextBox.Message("NPC", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris varius felis sed nibh ullamcorper, eget vulputate diam consectetur. Pellentesque eget hendrerit sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aenean urna leo, iaculis a lacinia et, rhoncus vel leo. Aliquam posuere lorem nec tempor aliquet. Morbi et pellentesque diam, vitae vehicula sem.");
 		}
 		else if (FlxG.keys.pressed.M)
 		{
-			TextBox.Message("Short", "I like big buts.");
+			TextBox.Message("Short", "This text should be of a shorter length.");
+			TextBox.Message("Long", "What is happening?");
 		}
 		
 		if (FlxG.keys.anyJustPressed(["T"]))

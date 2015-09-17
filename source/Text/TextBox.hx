@@ -12,6 +12,15 @@ import flixel.util.FlxTimer;
 
 class TextBox extends FlxGroup
 {
+	var originX : Int = 8;
+	var originY : Int = 10;
+	
+	var borderX : Int = 8;
+	var borderY : Int = 8;
+		
+	var boxWidth : Int = Std.int(FlxG.width - 16);
+	var boxHeight: Int = Std.int(FlxG.height / 2 - 16);
+	
 	private var _background:FlxSprite;
 	private var _isVisible:Bool;
 	private var _name:FlxText;
@@ -37,17 +46,18 @@ class TextBox extends FlxGroup
 		super();
 
 		// Initialize the background image, you can use a simple FlxSprite fill with one color
-		// _background = new FlxSprite(0, FlxG.height - 128, "assets/images/textbox.png");
-		_background = new FlxSprite(8, 10).makeGraphic(Std.int(FlxG.width - 16), Std.int(FlxG.height / 2 - 16), 0xFF010101);
+		_background = new FlxSprite(originX, originY).makeGraphic(boxWidth, boxHeight, 0xFF010101);
 		_background.scrollFactor.set(0, 0);
 		
 	 	// The name of the person who talk, from the arguments
-	 	_name = new FlxText(8 , _background.y, 136, NAME, 8);
+	 	_name = new FlxText(originX, originY, NAME, 8);
 	 	_name.color = 0xffbcbcbc;	
+		_name.scrollFactor.set(0, 0);
 
 	 	// The skip text, you can change the key
-	 	_skip = new FlxText(FlxG.width - 132, _background.y + _background.height - 24, 132, ">", 8);
+	 	_skip = new FlxText(originX + boxWidth - 8, originY + boxHeight - 8, 8, ">", 8);
 	 	_skip.color = 0xffbcbcbc;
+		_skip.scrollFactor.set(0, 0);
 
 	 	// Initialize all the bools for the TextBox system
 		_isVisible = false;
@@ -87,8 +97,10 @@ class TextBox extends FlxGroup
 			show();
 
 			// Set up a new TypeWriter for each text
-			_typetext = new TypeWriter(Std.int(_background.x + 8), Std.int(_background.y + 8), 
-									Std.int(_background.width - 16), TEXT, 8, Std.int(_background.height - 16));
+			_typetext = new TypeWriter(originX + borderX, 
+									   originY + borderY, 
+									   boxWidth - borderX*2, 
+									   TEXT, 8, boxHeight - borderY*2);
 
 			_typetext.scrollFactor.set();
 			
