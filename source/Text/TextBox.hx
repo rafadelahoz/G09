@@ -4,7 +4,11 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxGroup;
 import flixel.text.FlxText;
+import flixel.text.FlxBitmapTextField;
+import flixel.text.pxText.PxBitmapFont;
 import flixel.util.FlxTimer;
+
+import openfl.Assets;
 
 /**
  * @author Simon Zeni (Bl4ckb0ne)
@@ -45,14 +49,21 @@ class TextBox extends FlxGroup
 	{
 		super();
 
+		// var FontStr : String = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\\";
+		/*var FontStr : String =" !\"#$%&'()*+,-./" + "0123456789:;<=>?" + "@ABCDEFGHIJKLMNO" + "PQRSTUVWXYZ[]^_" + "abcdefghijklmno" + "pqrstuvwxyz{|}~\\";
+		trace("Loading font");
+		var what : Dynamic = Assets.getBitmapData("assets/images/font.png");
+		trace("Got Bitmap data");
+		var font : PxBitmapFont = new PxBitmapFont().loadPixelizer(what, FontStr);*/
+		
 		// Initialize the background image, you can use a simple FlxSprite fill with one color
 		_background = new FlxSprite(originX, originY).makeGraphic(boxWidth, boxHeight, 0xFF010101);
 		_background.scrollFactor.set(0, 0);
 		
 	 	// The name of the person who talk, from the arguments
-	 	_name = new FlxText(originX, originY, NAME, 8);
+	 	/*_name = new FlxText(originX, originY, NAME, 8);
 	 	_name.color = 0xffbcbcbc;	
-		_name.scrollFactor.set(0, 0);
+		_name.scrollFactor.set(0, 0);*/
 
 	 	// The skip text, you can change the key
 	 	_skip = new FlxText(originX + boxWidth - 8, originY + boxHeight - 8, 8, ">", 8);
@@ -67,9 +78,29 @@ class TextBox extends FlxGroup
 
 	public function show():Void
 	{
-		add(_background);
-		add(_name);
-		add(_skip);
+		/*add(_background);
+		// add(_name);
+		add(_skip);*/
+		
+				
+		var textBytes = Assets.getText("assets/fonts/16bfzx.fnt");
+		var XMLData = Xml.parse(textBytes);
+		var font:PxBitmapFont = new PxBitmapFont().loadAngelCode(Assets.getBitmapData("assets/fonts/16bfzx.png"), XMLData);
+		
+		var text : FlxBitmapTextField = new FlxBitmapTextField(font);
+		text.x = originX;
+		text.y = originY;
+		text.text = "The name is 123546?._!";
+		text.color = 0xffffff;
+		text.fixedWidth = false;
+		text.multiLine = true;
+		text.lineSpacing = 5;
+		text.padding = 5;
+		text.scale.x = 5;
+		text.scrollFactor.set(0, 0);
+		trace(text);
+		add(text);
+		
 		_isVisible = true;
 		
 		PlayFlowManager.get().doPause();
