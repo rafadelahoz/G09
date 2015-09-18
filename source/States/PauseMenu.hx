@@ -4,19 +4,21 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxSubState;
 import flixel.text.FlxText;
-import flixel.addons.text.FlxBitmapFont;
+import flixel.text.FlxBitmapTextField;
 import flixel.util.FlxRandom;
 import flixel.group.FlxSpriteGroup;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 
+import text.PixelText;
+
 class PauseMenu extends FlxSubState
 {
 	var group : FlxSpriteGroup;
-	var text : FlxBitmapFont;
+	var text : FlxBitmapTextField;
 	var bg : FlxSprite;
 	
-	var capturesListText : FlxBitmapFont;
+	var capturesListText : FlxBitmapTextField;
 	
 	public function new()
 	{
@@ -27,21 +29,17 @@ class PauseMenu extends FlxSubState
 		bg = new FlxSprite(0, 0).makeGraphic(FlxG.width, FlxG.height, 0xFF000000);
 		bg.scrollFactor.set();
 		
-		text = new FlxBitmapFont(GameConstants.Font, 8, 8, FlxBitmapFont.TEXT_SET1, 16);
-		text.x = FlxG.width / 2 - 48;
-		text.y = FlxG.height / 4;
-		text.text = " ~ PAUSED! ~ ";
+		text = PixelText.New(FlxG.width / 2 - 48, FlxG.height / 4, " ~ PAUSED! ~ ");
 		text.scrollFactor.set();
 		
-		capturesListText = new FlxBitmapFont(GameConstants.Font, 8, 8, FlxBitmapFont.TEXT_SET1, 16);
+		
 		var listText = "-CAPTURES-\n";
 		for (capture in GameStatusManager.getCaptures())
 		{
 			listText += "> " + capture + "\n";
 		}
-		capturesListText.setText(listText, true);
-		capturesListText.x = 16;
-		capturesListText.y = text.y + 16;
+		
+		capturesListText = PixelText.New(16, text.y+16, listText, 0xFFFFFFFF, 12*8);
 		capturesListText.scrollFactor.set();
 		
 		group.scrollFactor.set();

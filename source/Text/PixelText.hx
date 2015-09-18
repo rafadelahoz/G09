@@ -33,9 +33,10 @@ class PixelText
 		
 		var text : FlxBitmapTextField = new FlxBitmapTextField(font);
 		text.x = X;
-		text.y = Y;
+		text.y = Y - 4;
 		text.text = Text;
-		text.textColor = Color;
+		text.color = Color;
+		text.useTextColor = false;
 		
 		if (Width > 0)
 		{
@@ -43,7 +44,7 @@ class PixelText
 			text.fixedWidth = true;
 			text.width = Width;
 			text.multiLine = true;
-			text.lineSpacing = 4;
+			// text.lineSpacing = -154;
 		}
 		
 		return text;

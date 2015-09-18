@@ -1,16 +1,18 @@
 package text;
 
 import flixel.FlxG;
-import flixel.text.FlxText;
+import flixel.text.FlxBitmapTextField;
+import flixel.text.pxText.PxTextAlign;
 import flixel.system.FlxSound;
 import flixel.util.FlxRandom;
 
 /**
- * This is loosely based on the TypeText class by Noel Berry, who wrote it for his Ludum Dare 22 game - Abandoned
- * http://www.ludumdare.com/compo/ludum-dare-22/?action=preview&uid=1527
- * @author Noel Berry
+ * Manages long chunks of text pixel font text, waiting for the user to confirm 
+ * before clearing a full text box
+ * This is loosely based on the FlxTypeText class inspired by TypeText by Noel Berry
+ * @author Rafa de la Hoz
  */
-class TypeWriter extends FlxText
+class TypeWriter extends FlxBitmapTextField
 {
 	/**
 	 * The delay between each character, in seconds.
@@ -147,7 +149,7 @@ class TypeWriter extends FlxText
 	 */
 	private static var helperString:String = "";
 	
-	private var finished : Bool;
+	public var finished : Bool;
 	
 	private static var lineHeight : Int = 10;
 	
@@ -156,6 +158,17 @@ class TypeWriter extends FlxText
 	private var targetLines : Int;
 	
 	private var remainingText : String;
+	
+	public var thereIsMoreText (get, null) : Bool;
+	public function get_thereIsMoreText() : Bool
+	{
+		return remainingText != null;
+	}
+	
+	/**
+	 * Line handling
+	 */
+	private var textLines : Array<String>;
 	
 	/**
 	 * Create a FlxTypeText object, which is very similar to FlxText except that the text is initially hidden and can be
@@ -168,16 +181,30 @@ class TypeWriter extends FlxText
 	 * @param	Size			The size of the text.
 	 * @param	EmbeddedFont	Whether this text field uses embedded fonts or not.
 	 */
-	public function new(X:Float, Y:Float, Width:Int, Text:String, Size:Int = 8, TargetHeight : Int = -1, EmbeddedFont:Bool = true)
+	public function new(X:Float, Y:Float, Width:Int, ?Height : Int = -1, Text:String, ?Color : Int = 0xFFFFFFFF, ?Size:Int = 8)
 	{
-		super(X, Y, Width, "", Size, EmbeddedFont);
+		super(PixelText.font);
+		textLines = [];
+		
+		x = X;
+		y = Y;
+		width = Width;
+		text = "";
+		color = 0xFFFFFFFF;
+		useTextColor = false;
+		textColor = Color;
+		
+		wordWrap = true;
+		fixedWidth = true;
+		width = Width;
+		multiLine = true;
+		lineSpacing = 4;
+		
 		_finalText = Text;
 		
-		lineHeight = Size + 2;
-		targetHeight = TargetHeight;
+		lineHeight = Size;
+		targetHeight = Height;
 		targetLines = Std.int(targetHeight / lineHeight);
-		trace(targetHeight + "/" + lineHeight + "=" + targetLines);
-		// trace("Textbox with " + targetLines + " max lines");
 		
 		_onComplete = null;
 		_onErase = null;
@@ -403,7 +430,6 @@ class TypeWriter extends FlxText
 	 */
 	private function onComplete():Void
 	{
-		trace("onComplete");
 		_timer = 0;
 		_typing = false;
 	
@@ -449,16 +475,14 @@ class TypeWriter extends FlxText
 		// press a key before closing or continuing with the text
 		if (finished)
 		{
-			if (FlxG.keys.justReleased.A)
+			if (GamePad.justPressed(GamePad.A))
 			{
 				finished = false;
 				// If there is more text, we have not finished
 				if (remainingText != null)
 				{				
 					resetText(remainingText);
-					trace("Resetted");	
 					start(delay, true);
-					trace("Started");
 				}
 				// If there is no more text, we are done
 				else if (_typing)
@@ -471,8 +495,8 @@ class TypeWriter extends FlxText
 					onErased();
 				}
 			}
-			else
-				return;
+			
+			return;
 		}
 		
 		if (_waiting && !paused)
@@ -492,12 +516,12 @@ class TypeWriter extends FlxText
 		{
 			if (_length < _finalText.length && _typing)
 			{
-				_timer += FlxG.elapsed;
+				_timer += FlxG.elapsed * (GamePad.checkButton(GamePad.A) ? 10 : 1);
 			}
 			
 			if (_length > 0 && _erasing)
 			{
-				_timer += FlxG.elapsed;
+				_timer += FlxG.elapsed * (GamePad.checkButton(GamePad.A) ? 10 : 1);
 			}
 		}
 		
@@ -569,29 +593,32 @@ class TypeWriter extends FlxText
 		{
 			text = helperString;
 			
-			// Check if there is more space available for lines
-			// trace("lines: " + _textField.numLines);
-
-			var atValidWrapChar : Bool = false;
-			if (_textField.numLines == targetLines)
+			// Check for dramatic wrapping in the last line
+			var alreadyFull : Bool = false;
+			
+			if (textLines.length >= targetLines-1)
 			{
-				var lineWidth : Float = _textField.getLineMetrics(targetLines-1).width;
-				var lineText : String = _textField.getLineText(targetLines-1);
-				var remainer : String = _finalText.substring(_length - 1);
-				
-				if (lineWidth > 3*width/4 && validWrapChar(lineText.charAt(lineText.length-1)))
+				var lineText = textLines[textLines.length-1];
+				if (validWrapChar(lineText.charAt(lineText.length-1)))
 				{
-					var nextChar : String = remainer.charAt(1);
-					// Only wrap if the next char is not wrappable!
-					if (!validWrapChar(nextChar))
+					var remainer : String = _finalText.substring(_length - 1);
+					var remainerWords : Array<String> = remainer.split(" ");
+					var nextWordChunk : String = remainerWords[0];
+					
+					var currentLineWidth = PixelText.font.getTextWidth(lineText);
+					var nextWordWidth = PixelText.font.getTextWidth(nextWordChunk);
+					if (currentLineWidth + nextWordWidth > width)
 					{
-						atValidWrapChar = true;
+						/*trace("Current line: " + lineText);
+						trace("Cutting at:   " + lineText.charAt(lineText.length-1));
+						trace("Remainer:     " + remainer);
+						trace("Next word:    " + nextWordChunk);*/
+						alreadyFull = true;
 					}
 				}
 			}
 			
-			// if (targetHeight > 0 && height + lineHeight > targetHeight && _length < _finalText.length)
-			if (targetHeight > 0 && _length < _finalText.length && atValidWrapChar)
+			if (alreadyFull && targetHeight > 0 && _length < _finalText.length)
 			{
 				finished = true;
 
@@ -599,9 +626,9 @@ class TypeWriter extends FlxText
 				text = text.substring(0, text.length-1);
 				
 				// We have run out of space!
-				remainingText = _finalText.substring(_length - 1);				
+				remainingText = _finalText.substring(_length - 1);
 				
-				trace("There is no more space for: \n" + remainingText);
+				// trace("There is no more space for: \n" + remainingText);
 			}
 			else
 			{
@@ -610,8 +637,7 @@ class TypeWriter extends FlxText
 				
 				if (_length >= _finalText.length && _typing && !_waiting && !_erasing)
 				{
-					finished = true;
-					trace("finished typing");
+					finished = true;					
 				}
 				
 				// If we're done erasing, call the onErased() function
@@ -619,7 +645,6 @@ class TypeWriter extends FlxText
 				if (_length == 0 && _erasing && !_typing && !_waiting)
 				{
 					finished = true;
-					trace("finished erasing");
 				}
 			}
 		}
@@ -648,4 +673,341 @@ class TypeWriter extends FlxText
 			_length = _finalText.length;
 		}
 	}*/
+	
+	/**
+	 * Don't look! Stop!
+	 */ 
+	override private function updateBitmapData():Void 
+	{
+		if (!_pendingTextChange) 
+		{
+			return;
+		}
+		
+		if (_font == null)
+		{
+			return;
+		}
+		
+		var preparedText:String = (_autoUpperCase) ? _text.toUpperCase() : _text;
+		var calcFieldWidth:Int = 0; // Std.int(width);
+		var rows:Array<String> = [];
+		
+		#if FLX_RENDER_BLIT
+		var fontHeight:Int = Math.floor(_font.getFontHeight() * _fontScale);
+		#else
+		var fontHeight:Int = _font.getFontHeight();
+		#end
+		
+		var alignment:Int = _alignment;
+		
+		// Cut text into pices
+		var lineComplete:Bool;
+		
+		// Get words
+		var lines:Array<String> = preparedText.split("\n");
+		var i:Int = -1;
+		var j:Int = -1;
+		
+		if (!_multiLine)
+		{
+			lines = [lines[0]];
+		}
+		
+		var wordLength:Int;
+		var word:String;
+		var tempStr:String;
+		
+		while (++i < lines.length) 
+		{
+			if (_fixedWidth)
+			{
+				lineComplete = false;
+				var words:Array<String> = [];
+				
+				if (!wordWrap)
+				{
+					words = lines[i].split("\t").join(_tabSpaces).split(" ");
+				}
+				else
+				{
+					words = lines[i].split("\t").join(" \t ").split(" ");
+				}
+				
+				if (words.length > 0) 
+				{
+					var wordPos:Int = 0;
+					var txt:String = "";
+					
+					while (!lineComplete) 
+					{
+						word = words[wordPos];
+						var changed:Bool = false;
+						var currentRow:String = txt + word;
+						
+						if (_wordWrap)
+						{
+							var prevWord:String = (wordPos > 0) ? words[wordPos - 1] : "";
+							var nextWord:String = (wordPos < words.length) ? words[wordPos + 1] : "";
+							if (prevWord != "\t") currentRow += " ";
+							
+							if (_font.getTextWidth(currentRow, _letterSpacing, _fontScale) > width) 
+							{
+								if (txt == "")
+								{
+									words.splice(0, 1);
+								}
+								else
+								{
+									rows.push(txt.substr(0, txt.length - 1));
+								}
+								
+								txt = "";
+								
+								if (_multiLine)
+								{
+									if (word == "\t" && (wordPos < words.length))
+									{
+										words.splice(0, wordPos + 1);
+									}
+									else
+									{
+										words.splice(0, wordPos);
+									}
+								}
+								else
+								{
+									words.splice(0, words.length);
+								}
+								
+								wordPos = 0;
+								changed = true;
+							}
+							else
+							{
+								if (word == "\t")
+								{
+									txt += _tabSpaces;
+								}
+								if (nextWord == "\t" || prevWord == "\t")
+								{
+									txt += word;
+								}
+								else
+								{
+									txt += word + " ";
+								}
+								wordPos++;
+							}
+						}
+						else
+						{
+							if (_font.getTextWidth(currentRow, _letterSpacing, _fontScale) > width) 
+							{
+								if (word != "")
+								{
+									j = 0;
+									tempStr = "";
+									wordLength = word.length;
+									while (j < wordLength)
+									{
+										currentRow = txt + word.charAt(j);
+										
+										if (_font.getTextWidth(currentRow, _letterSpacing, _fontScale) > width) 
+										{
+											rows.push(txt.substr(0, txt.length - 1));
+											txt = "";
+											word = "";
+											wordPos = words.length;
+											j = wordLength;
+											changed = true;
+										}
+										else
+										{
+											txt += word.charAt(j);
+										}
+										
+										j++;
+									}
+								}
+								else
+								{
+									changed = false;
+									wordPos = words.length;
+								}
+							}
+							else
+							{
+								txt += word + " ";
+								wordPos++;
+							}
+						}
+						
+						if (wordPos >= words.length) 
+						{
+							if (!changed) 
+							{
+								calcFieldWidth = Std.int(Math.max(calcFieldWidth, _font.getTextWidth(txt, _letterSpacing, _fontScale)));
+								rows.push(txt);
+							}
+							lineComplete = true;
+						}
+					}
+				}
+				else
+				{
+					rows.push("");
+				}
+			}
+			else
+			{
+				var lineWithoutTabs:String = lines[i].split("\t").join(_tabSpaces);
+				calcFieldWidth = Std.int(Math.max(calcFieldWidth, _font.getTextWidth(lineWithoutTabs, _letterSpacing, _fontScale)));
+				rows.push(lineWithoutTabs);
+			}
+		}
+		
+		var finalWidth:Int = (_fixedWidth) ? Std.int(width) : calcFieldWidth + _padding * 2 + (_outline ? 2 : 0);
+		
+		#if FLX_RENDER_BLIT
+		var finalHeight:Int = Std.int(_padding * 2 + Math.max(1, (rows.length * fontHeight + (_shadow ? 1 : 0)) + (_outline ? 2 : 0))) + ((rows.length >= 1) ? _lineSpacing * (rows.length - 1) : 0);
+		#else
+		
+		var finalHeight:Int = Std.int(_padding * 2 + Math.max(1, (rows.length * fontHeight * _fontScale + (_shadow ? 1 : 0)) + (_outline ? 2 : 0))) + ((rows.length >= 1) ? _lineSpacing * (rows.length - 1) : 0);
+		
+		width = frameWidth = finalWidth;
+		height = frameHeight = finalHeight;
+		frames = 1;
+		origin.x = width * 0.5;
+		origin.y = height * 0.5;
+		
+		_halfWidth = origin.x;
+		_halfHeight = origin.y;
+		#end
+		
+		#if FLX_RENDER_BLIT
+		if (pixels == null || (finalWidth != pixels.width || finalHeight != pixels.height)) 
+		{
+			pixels = new BitmapData(finalWidth, finalHeight, !_background, _backgroundColor);
+		} 
+		else 
+		{
+			pixels.fillRect(cachedGraphics.bitmap.rect, _backgroundColor);
+		}
+		#else
+		_drawData.splice(0, _drawData.length);
+		_bgDrawData.splice(0, _bgDrawData.length);
+		
+		if (cachedGraphics == null)
+		{
+			return;
+		}
+		
+		// Draw background
+		if (_background)
+		{
+			// Tile_ID
+			_bgDrawData.push(_font.bgTileID);		
+			_bgDrawData.push( -_halfWidth);
+			_bgDrawData.push( -_halfHeight);
+			
+			#if FLX_RENDER_TILE
+			var colorMultiplier:Float = 1 / (255 * 255);
+			
+			var red:Float = (_backgroundColor >> 16) * colorMultiplier;
+			var green:Float = (_backgroundColor >> 8 & 0xff) * colorMultiplier;
+			var blue:Float = (_backgroundColor & 0xff) * colorMultiplier;
+			
+			red *= (color >> 16);
+			green *= (color >> 8 & 0xff);
+			blue *= (color & 0xff);
+			#end
+			
+			_bgDrawData.push(red);
+			_bgDrawData.push(green);
+			_bgDrawData.push(blue);
+		}
+		#end
+		
+		if (_fontScale > 0)
+		{
+			#if FLX_RENDER_BLIT
+			pixels.lock();
+			#end
+			
+			// Render text
+			var row:Int = 0;
+			
+			for (t in rows) 
+			{
+				// LEFT
+				var ox:Int = 0;
+				var oy:Int = 0;
+				
+				if (alignment == PxTextAlign.CENTER) 
+				{
+					if (_fixedWidth)
+					{
+						ox = Std.int((width - _font.getTextWidth(t, _letterSpacing, _fontScale)) / 2);
+					}
+					else
+					{
+						ox = Std.int((finalWidth - _font.getTextWidth(t, _letterSpacing, _fontScale)) / 2);
+					}
+				}
+				if (alignment == PxTextAlign.RIGHT) 
+				{
+					if (_fixedWidth)
+					{
+						ox = Std.int(width) - Std.int(_font.getTextWidth(t, _letterSpacing, _fontScale));
+					}
+					else
+					{
+						ox = finalWidth - Std.int(_font.getTextWidth(t, _letterSpacing, _fontScale)) - 2 * padding;
+					}
+				}
+				if (_outline) 
+				{
+					for (py in 0...(2 + 1)) 
+					{
+						for (px in 0...(2 + 1)) 
+						{
+							#if FLX_RENDER_BLIT
+							_font.render(pixels, _preparedOutlineGlyphs, t, _outlineColor, px + ox + _padding, py + row * (fontHeight + _lineSpacing) + _padding, _letterSpacing);
+							#else
+							_font.render(_drawData, t, _outlineColor, color, alpha, px + ox + _padding - _halfWidth, py + row * (fontHeight * _fontScale + _lineSpacing) + _padding - _halfHeight, _letterSpacing, _fontScale);
+							#end
+						}
+					}
+					ox += 1;
+					oy += 1;
+				}
+				if (_shadow) 
+				{
+					#if FLX_RENDER_BLIT
+					_font.render(pixels, _preparedShadowGlyphs, t, _shadowColor, 1 + ox + _padding, 1 + oy + row * (fontHeight + _lineSpacing) + _padding, _letterSpacing);
+					#else
+					_font.render(_drawData, t, _shadowColor, color, alpha, 1 + ox + _padding - _halfWidth, 1 + oy + row * (fontHeight * _fontScale + _lineSpacing) + _padding - _halfHeight, _letterSpacing, _fontScale);
+					#end
+				}
+				
+				#if FLX_RENDER_BLIT
+				_font.render(pixels, _preparedTextGlyphs, t, _textColor, ox + _padding, oy + row * (fontHeight + _lineSpacing) + _padding, _letterSpacing);
+				#else
+				_font.render(_drawData, t, _textColor, color, alpha, ox + _padding - _halfWidth, oy + row * (fontHeight * _fontScale + _lineSpacing) + _padding - _halfHeight, _letterSpacing, _fontScale, _useTextColor);
+				#end
+				row++;
+			}
+			
+			#if FLX_RENDER_BLIT
+			pixels.unlock();
+			resetFrameBitmapDatas();
+			dirty = true;
+			#end
+			
+			textLines = rows;
+		}
+		
+		_pendingTextChange = false;
+	}
 }

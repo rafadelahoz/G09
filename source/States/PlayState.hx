@@ -461,7 +461,7 @@ class PlayState extends GameState
 		
 		if (FlxG.keys.pressed.O)
 		{
-			TextBox.Message("NPC", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris varius felis sed nibh ullamcorper, eget vulputate diam consectetur. Pellentesque eget hendrerit sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aenean urna leo, iaculis a lacinia et, rhoncus vel leo. Aliquam posuere lorem nec tempor aliquet. Morbi et pellentesque diam, vitae vehicula sem.");
+			TextBox.Message("NPC", "Are you here to steal our animals?");
 		}
 		else if (FlxG.keys.pressed.M)
 		{
