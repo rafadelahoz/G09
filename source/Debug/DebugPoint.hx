@@ -2,12 +2,7 @@ package;
 
 import flixel.FlxSprite;
 import flixel.util.FlxTimer;
-
-/*
-	// Sample usage:
-	PlayFlowManager.get().world.add(new DebugPoint(Std.int(topleft.x), Std.int(topleft.y)));
-	PlayFlowManager.get().world.add(new DebugPoint(Std.int(botright.x), Std.int(botright.y)));
-*/
+import flixel.util.FlxPoint;
 
 class DebugPoint extends FlxSprite
 {

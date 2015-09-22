@@ -34,6 +34,14 @@ class GameController
 		FlxG.switchState(new PlayState(GameStatusManager.Status.currentMap));
 	}
 	
+	public static function OnPlayerDeath() 
+	{
+		text.TextBox.Message("", "   YOU ARE DEAD!   ", function() {
+			// Revive for now
+			GameStatusManager.setPlayerHP(3);
+		});
+	}
+	
 	/** Status handling functions **/
 	
 	public static function NewGame()

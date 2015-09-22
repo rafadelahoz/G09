@@ -3,7 +3,7 @@ package;
 import flixel.util.FlxPoint;
 import flixel.group.FlxTypedGroup;
 
-class ShooterComponent
+class PlayerShooterComponent
 {
 	public static var PistolBulletSpeed : Float = 300;
 	public static var BlasterBulletSpeed : Float = 320;

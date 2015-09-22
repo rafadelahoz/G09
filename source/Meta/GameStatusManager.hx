@@ -18,9 +18,21 @@ class GameStatusManager
 		};
 		
 		PlayerStatus = {
+			hp: 3,
 			weapon: Player.WPISTOL,
 			facing: FlxObject.RIGHT
 		};
+	}
+	
+	/** Player Status Management **/
+	public static function getPlayerHP() : Int
+	{
+		return PlayerStatus.hp;
+	}
+	
+	public static function setPlayerHP(hp : Int) : Void
+	{
+		PlayerStatus.hp = hp;
 	}
 	
 	/** Coins Management **/
@@ -120,6 +132,7 @@ typedef Data = {
 }
 
 typedef PlayerData = {
+	hp: Int,
 	weapon: Int,
 	facing: Int
 }

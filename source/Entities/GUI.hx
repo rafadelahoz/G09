@@ -18,8 +18,9 @@ class GUI extends FlxTypedGroup<FlxSprite>
 {
 	var topBackground : FlxSprite;
 	
-	var coinDisplayText : FlxBitmapFont;
-	var weaponDisplayText : FlxBitmapFont;
+	var coinDisplayText : FlxBitmapTextField;
+	var weaponDisplayText : FlxBitmapTextField;
+	var healthDisplayText : FlxBitmapTextField;
 	
 	var dbgText : FlxBitmapTextField;
 
@@ -30,12 +31,17 @@ class GUI extends FlxTypedGroup<FlxSprite>
 		topBackground = new FlxSprite(0, 0).makeGraphic(FlxG.width, 8, 0xFF000000);
 		add(topBackground);
 		
-		coinDisplayText = new FlxBitmapFont(GameConstants.Font, 8, 8, FlxBitmapFont.TEXT_SET1, 16);
+		// coinDisplayText = new FlxBitmapFont(GameConstants.Font, 8, 8, FlxBitmapFont.TEXT_SET1, 16);
+		coinDisplayText = PixelText.New(0, 0, "");
 		add(coinDisplayText);
 		
-		weaponDisplayText = new FlxBitmapFont(GameConstants.Font, 8, 8, FlxBitmapFont.TEXT_SET1, 16);
-		weaponDisplayText.x = FlxG.width - 64;
+		// weaponDisplayText = new FlxBitmapFont(GameConstants.Font, 8, 8, FlxBitmapFont.TEXT_SET1, 16);
+		// weaponDisplayText.x = FlxG.width - 64;
+		weaponDisplayText = PixelText.New(FlxG.width - 64, 0, "");
 		add(weaponDisplayText);
+		
+		healthDisplayText = PixelText.New(96, 0, "");
+		add(healthDisplayText);
 		
 		// Scrollfactor.set()
 		forEach(function(spr : FlxSprite) {
@@ -47,6 +53,7 @@ class GUI extends FlxTypedGroup<FlxSprite>
 	{
 		updateCoinDisplay();
 		updateWeaponDisplay();
+		updateHealthDisplay();
 		
 		super.update();
 	}
@@ -77,5 +84,17 @@ class GUI extends FlxTypedGroup<FlxSprite>
 		// Update only when necessary!
 		if (text != weaponDisplayText.text)
 			weaponDisplayText.text = text;
+	}
+	
+	private function updateHealthDisplay()
+	{
+		var text = "";
+		for (i in 0...GameStatusManager.getPlayerHP())
+		{
+			text += "O";
+		}
+		
+		if (text != healthDisplayText.text)
+			healthDisplayText.text = text;
 	}
 }

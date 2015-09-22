@@ -45,7 +45,7 @@ class PlayState extends GameState
 		
 	public var playerBullets : FlxGroup;
 	
-	public var enemyBullets : FlxGroup;
+	public var enemyBullets : FlxTypedGroup<EnemyBullet>;
 	
 	public var collectibles : FlxTypedGroup<Collectible>;
 	
@@ -88,7 +88,7 @@ class PlayState extends GameState
 			
 		playerBullets = new FlxGroup();
 		
-		enemyBullets = new FlxGroup();
+		enemyBullets = new FlxTypedGroup<EnemyBullet>();
 
 		collectibles = new FlxTypedGroup<Collectible>();
 		teleports = new FlxTypedGroup<Teleport>();
@@ -146,7 +146,10 @@ class PlayState extends GameState
 
 		level.destroy();
 		level = null;
-
+		
+		enemyBullets.destroy();
+		enemyBullets = null;
+		
 		collidableEnemies.destroy();
 		collidableEnemies = null;
 		nonCollidableEnemies.destroy();
@@ -226,6 +229,9 @@ class PlayState extends GameState
 			
 			// PlayerBullets vs Decoration
 			// FlxG.overlap(playerBullets, decoration, onBulletDecorationCollision);
+			
+			// Player vs EnemyBullets
+			FlxG.overlap(enemyBullets, player, onEnemyBulletCollision);
 			
 			// Player vs Enemies
 			FlxG.overlap(enemies, player, onEnemyCollision);
@@ -336,7 +342,7 @@ class PlayState extends GameState
 	
 	public function onEnemyCollision(one : Enemy, two : Player) : Void
 	{
-		FlxObject.separate(one, two);
+		// FlxObject.separate(one, two);
 		one.onCollisionWithPlayer(two);
 		two.onCollisionWithEnemy(one);
 	}
@@ -348,6 +354,15 @@ class PlayState extends GameState
 			FlxObject.separate(a, b);
 		else
 			trace("NO COLL");
+	}
+	
+	public function onEnemyBulletCollision(bullet : EnemyBullet, p : Player) : Void
+	{
+		if (!p.rolling) 
+		{
+			p.onCollisionWithEnemyBullet(bullet);
+			bullet.onCollisionWithPlayer(p);
+		}
 	}
 
 	public function onCollectibleCollision(collectible : Collectible, player : Player)
@@ -428,19 +443,6 @@ class PlayState extends GameState
 			collectibles.add(coin);
 		}
 
-		if (FlxG.keys.justPressed.ONE) 
-		{
-			var enemy : Enemy = new EnemyWalker(mousePos.x, mousePos.y, this);
-			enemy.init(0);
-			addEnemy(enemy);
-		} 
-		else if (FlxG.keys.justReleased.TWO) 
-		{
-			var enemy : Enemy = new EnemyFollower(mousePos.x, mousePos.y, this);
-			enemy.init(0);
-			addEnemy(enemy);
-		}
-		
 		if (FlxG.keys.justPressed.ONE)
 		{
 			var enemy : Enemy = new EnemyWalker(mousePos.x, mousePos.y, this);
@@ -454,6 +456,12 @@ class PlayState extends GameState
 			addEnemy(enemy);
 		}
 		else if (FlxG.keys.justPressed.THREE)
+		{
+			var enemy : Enemy = new EnemyShooter(mousePos.x, mousePos.y, this);
+			enemy.init(0);
+			addEnemy(enemy);
+		}
+		else if (FlxG.keys.justPressed.FOUR)
 		{
 			var pkg : Package = new Package(mousePos.x - 8, mousePos.y - 16, this, "HURR!");
 			collectibles.add(pkg);

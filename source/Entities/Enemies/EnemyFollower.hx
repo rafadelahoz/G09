@@ -48,6 +48,20 @@ class EnemyFollower extends Enemy
 	
 	override public function update()
 	{
+		if (frozen)
+		{
+			timer.active = false;
+			if (tween != null)
+				tween.active = false;
+			return;
+		}
+		else
+		{
+			timer.active = true;
+			if (tween != null)
+				tween.active = true;
+		}
+	
 		super.update();
 		
 		shadow.x = getMidpoint().x - shadow.width / 2;

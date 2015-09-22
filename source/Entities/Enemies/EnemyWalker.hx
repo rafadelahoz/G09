@@ -58,6 +58,20 @@ class EnemyWalker extends Enemy
 		display.y = y - 8;
 		display.text = "HP: " + hp;*/
 		
+		if (frozen)
+		{
+			timer.active = false;
+			if (tween != null)
+				tween.active = false;
+			return;
+		}
+		else
+		{
+			timer.active = true;
+			if (tween != null)
+				tween.active = true;
+		}
+		
 		super.update();
 
 		shadow.x = getMidpoint().x - shadow.width / 2;
@@ -208,9 +222,24 @@ class EnemyWalker extends Enemy
 		}
 	}	
 	
+	function retreat(player : Player) : Void
+	{
+		switch (direction)
+		{
+			case FlxObject.LEFT:
+				direction = FlxObject.RIGHT;
+			case FlxObject.RIGHT:
+				direction = FlxObject.LEFT;
+			case FlxObject.UP:
+				direction = FlxObject.DOWN;
+			case FlxObject.DOWN:
+				direction = FlxObject.UP;
+		}
+	}
+	
 	override public function onCollisionWithPlayer(player : Player)
 	{
-		// delegating...
+		retreat(player);
 	}
 	
 	override public function draw()

@@ -47,6 +47,9 @@ class PlayerBullet extends Entity
 	
 	override public function update()
 	{
+		if (frozen)
+			return;
+	
 		if (!inWorldBounds() || justTouched(FlxObject.ANY))
 		{
 			kill();

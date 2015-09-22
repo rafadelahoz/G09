@@ -35,11 +35,12 @@ class TextBox extends FlxGroup
 	private var _callback:Dynamic;
 
 	private static var textBox : TextBox;
-	public static function Message(name : String, message : String, ?callback:Dynamic)
+	public static function Message(name : String, message : String, ?completeCallback:Dynamic)
 	{
 		if (textBox == null) 
 		{
 			textBox = new TextBox(name);
+			textBox._callback = completeCallback;
 			textBox.talk(message);
 			PlayFlowManager.get().group.add(textBox);
 		}
