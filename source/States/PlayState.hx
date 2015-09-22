@@ -342,9 +342,11 @@ class PlayState extends GameState
 	
 	public function onEnemyCollision(one : Enemy, two : Player) : Void
 	{
-		// FlxObject.separate(one, two);
-		one.onCollisionWithPlayer(two);
-		two.onCollisionWithEnemy(one);
+		if (!two.rolling) 
+		{
+			one.onCollisionWithPlayer(two);
+			two.onCollisionWithEnemy(one);
+		}
 	}
 	
 	public function onEnemyEnemyCollision(a : Enemy, b : Enemy) : Void
