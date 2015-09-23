@@ -32,9 +32,9 @@ class Player extends Entity
 	
 	public var MaxCarriedPackages 	: Int = 3;
 
-	var hp (get, set): Int;
-	var invulnerable : Bool;
-	var halted : Bool;
+	public var hp (get, set): Int;
+	public var invulnerable : Bool;
+	public var halted : Bool;
 	
 	var shooterComponent : PlayerShooterComponent;
 	var timer : FlxTimer;
@@ -121,6 +121,8 @@ class Player extends Entity
 			}
 			else
 			{
+				lastDirection = FlxObject.NONE;
+				
 				if (!shooting)
 				{
 					if (GamePad.checkButton(GamePad.Left))
@@ -256,6 +258,12 @@ class Player extends Entity
 					rollSpeed.y = -RollVSpeed;
 				case FlxObject.DOWN:
 					rollSpeed.y = RollVSpeed;
+				case FlxObject.NONE:
+					// Roll backwards if no direction is pressed
+					if (facing == FlxObject.RIGHT)
+						rollSpeed.x = -RollHSpeed;
+					else if (facing == FlxObject.LEFT)
+						rollSpeed.x = RollHSpeed;
 			}
 			
 			velocity.x = rollSpeed.x;
@@ -297,8 +305,11 @@ class Player extends Entity
 		if (hp <= 0)
 		{
 			// Player is dead!
+			PlayFlowManager.get().group.add(this);
+			PlayFlowManager.get().doPause();
 			doFlicker(function(_f:FlxFlicker) {
 				invulnerable = false;
+				PlayFlowManager.get().group.remove(this);
 				GameController.OnPlayerDeath();
 			});
 		}

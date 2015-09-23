@@ -459,11 +459,17 @@ class PlayState extends GameState
 		}
 		else if (FlxG.keys.justPressed.THREE)
 		{
-			var enemy : Enemy = new EnemyShooter(mousePos.x, mousePos.y, this);
+			var enemy : Enemy = new EnemySniper(mousePos.x, mousePos.y, this);
 			enemy.init(0);
 			addEnemy(enemy);
 		}
 		else if (FlxG.keys.justPressed.FOUR)
+		{
+			var enemy : Enemy = new EnemyShooter(mousePos.x, mousePos.y, this);
+			enemy.init(0);
+			addEnemy(enemy);
+		}
+		else if (FlxG.keys.justPressed.FIVE)
 		{
 			var pkg : Package = new Package(mousePos.x - 8, mousePos.y - 16, this, "HURR!");
 			collectibles.add(pkg);

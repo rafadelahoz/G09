@@ -4,30 +4,27 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.util.FlxTimer;
 import flixel.util.FlxPoint;
-import flixel.util.FlxRandom;
 import flixel.group.FlxTypedGroup;
 
 using flixel.util.FlxSpriteUtil;
 
-class EnemyShooter extends Enemy
+class EnemySniper extends Enemy
 {
 	public var HurtTime : Float = 0.34;
-	public var IdleTime : Float = 0.4;
-	public var CooldownTime : Float = 0.4;
-	public var CoverWaitTime : Float = 1.5;
-	public var AttackDistance : Int = 128;
+
+	var idleTime : Float = 4;
+	var shootTime : Float = 1;
+	var shoots : Int = 1;
 		
 	var shooter : ShooterComponent;
-	
-	var waitingInCover : Bool;
-	var covered : Bool;
+
 	var flickering : Bool;
 	
 	public function new(X : Float, Y : Float, World: PlayState)
 	{
 		super(X, Y, World);
 		
-		makeGraphic(16, 24, 0xFF500488);
+		makeGraphic(16, 24, 0xFF880450);
 		/*loadGraphic("assets/images/plant-sheet.png", true, 32, 24);
 		animation.add("idle", [4]);
 		animation.add("open", [4, 5], 6, false);
@@ -44,15 +41,14 @@ class EnemyShooter extends Enemy
 		hp = 2;
 		
 		shooter = new ShooterComponent();
-		shooter.init(world, EnemyBullet.EBulletType.Straight);
+		shooter.init(world, EnemyBullet.EBulletType.Aimed);
 		shooter.bulletSpeed = 185;
 		
 		brain = new StateMachine(null, onStateChange);
-		brain.transition(coverState, "cover");
+		brain.transition(idle, "idle");
 		
 		immovable = true;
 		flickering = false;
-		waitingInCover = false;
 	}
 	
 	override public function destroy()
@@ -84,33 +80,9 @@ class EnemyShooter extends Enemy
 		super.update();
 	}
 	
-	public function coverState()
-	{
-		covered = true;
-		alpha = 0.4;
-		
-		if (!waitingInCover)
-		{
-			if (getMidpoint().distanceTo(player.asTarget()) < AttackDistance && FlxRandom.chanceRoll(20))
-			{
-				if (!player.invulnerable)
-					brain.transition(idle, "idle");
-			}
-		}
-	}
-	
 	public function idle()
 	{
-		covered = false;
-		alpha = 1;
-		
-		color = 0xFFFFFFFF;
 		// animation.play("idle");
-		
-		if (getMidpoint().distanceTo(player.asTarget()) > AttackDistance && FlxRandom.chanceRoll(50))
-		{
-			brain.transition(coverState, "cover");
-		}
 	}
 	
 	public function shoot()
@@ -123,15 +95,12 @@ class EnemyShooter extends Enemy
 			shootBullet();
 			
 			// Wait a tad...
-			brain.transition(cooldown, "cooldown");
+			//timer.start(shootTime, function(t : FlxTimer) : Void {
+				// And idle
+				brain.transition(idle, "idle");
+			//});
 			
 		//}
-	}
-	
-	public function cooldown()
-	{
-		// ...
-		color = 0xFF400377;
 	}
 	
 	public function hitState()
@@ -148,38 +117,23 @@ class EnemyShooter extends Enemy
 		// animation.play("hurt");
 	}
 	
-	override public function setCollisionMask() : Void
-	{
-		if (covered)
-			setSize(0, 0);
-		else
-			setSize(16, 24);
-	}
 	
 	public function onStateChange(newState : String) : Void
 	{
 		switch (newState)
 		{
 			case "idle":
-				timer.start(IdleTime, function(_t:FlxTimer) {
-					brain.transition(shoot, "shoot");
-				});
+				timer.start(idleTime, 
+					function (t : FlxTimer) : Void {
+						brain.transition(shoot, "shoot");
+					});
+			case "half-idle":
+				timer.start(idleTime / 2, 
+					function (t : FlxTimer) : Void {
+						brain.transition(shoot, "shoot");
+					});
 			case "shoot":
 				// animation.play("open");
-			case "cooldown":
-				timer.start(CooldownTime, function(_t:FlxTimer) {
-					if (FlxRandom.chanceRoll(30))
-						brain.transition(idle, "idle");
-					else
-						brain.transition(coverState, "cover-wait");
-				});
-			case "cover":
-				waitingInCover = false;
-			case "cover-wait":
-				waitingInCover = true;
-				timer.start(CoverWaitTime, function(_t:FlxTimer) {
-					waitingInCover = false;
-				});
 			case "hit":
 				flickering = true;
 				flicker(HurtTime);
@@ -189,7 +143,7 @@ class EnemyShooter extends Enemy
 				
 					if (!dead && !stunned)
 					{
-						brain.transition(idle, "shoot");
+						brain.transition(idle, "half-idle");
 					}
 					else if (!dead && stunned)
 					{

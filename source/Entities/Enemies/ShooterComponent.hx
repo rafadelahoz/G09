@@ -6,7 +6,6 @@ import flixel.group.FlxTypedGroup;
 
 class ShooterComponent
 {
-	public static var BulletSpeed : Float = 300;
 	
 	var type : EnemyBullet.EBulletType;
 
