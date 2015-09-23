@@ -115,8 +115,8 @@ class EnemyWalker extends Enemy
 	{
 		// Check whether we are closer vertically or horizontally
 		// Horizontal distance is biased because of perspective
-		if (Math.abs(player.getMidpoint().y - getMidpoint().y) > 
-			Math.abs(player.getMidpoint().x - getMidpoint().x) * 0.7)
+		if (Math.abs(player.getMidpoint().y - getMidpoint().y) * 0.7 > 
+			Math.abs(player.getMidpoint().x - getMidpoint().x) )
 		{
 			return chooseHorizontalDirection();
 		}

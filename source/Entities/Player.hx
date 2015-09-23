@@ -196,7 +196,7 @@ class Player extends Entity
 		}
 	}
 	
-	function initShooterComponent(weapon : Int) : Void
+	public function initShooterComponent(weapon : Int) : Void
 	{
 		var btype : PlayerBullet.BulletType = PlayerBullet.BulletType.Pistol;
 		
@@ -248,6 +248,8 @@ class Player extends Entity
 			velocity.set();
 			rollSpeed.set();
 			
+			var rollDuration : Float = RollDuration;
+			
 			switch (lastDirection)
 			{
 				case FlxObject.LEFT:
@@ -259,7 +261,10 @@ class Player extends Entity
 				case FlxObject.DOWN:
 					rollSpeed.y = RollVSpeed;
 				case FlxObject.NONE:
-					// Roll backwards if no direction is pressed
+					
+					// Make a shorter roll backwards if no direction is pressed
+					rollDuration = (rollDuration * 0.5);
+					
 					if (facing == FlxObject.RIGHT)
 						rollSpeed.x = -RollHSpeed;
 					else if (facing == FlxObject.LEFT)
@@ -269,12 +274,12 @@ class Player extends Entity
 			velocity.x = rollSpeed.x;
 			velocity.y = rollSpeed.y;
 			
-			tween = FlxTween.tween(this, {angle: (facing == FlxObject.LEFT ? -360 : 360)}, RollDuration, 
+			tween = FlxTween.tween(this, {angle: (facing == FlxObject.LEFT ? -360 : 360)}, rollDuration, 
 				{
 					complete: function(t:FlxTween) { angle=0; }
 				});
 			
-			timer.start(RollDuration, function(_t:FlxTimer) {
+			timer.start(rollDuration, function(_t:FlxTimer) {
 				rolling = false;
 				velocity.set();
 				

@@ -33,7 +33,7 @@ class PlayerBullet extends Entity
 		}
 	}
 	
-	public function init(X : Int, Y : Int, HSpeed : Float, VSpeed : Float)
+	public function init(X : Float, Y : Float, HSpeed : Float, VSpeed : Float)
 	{
 		x = X;
 		y = Y;

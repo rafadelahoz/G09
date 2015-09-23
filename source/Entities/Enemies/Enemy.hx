@@ -133,8 +133,8 @@ class Enemy extends Entity
 			return;
 		
 		// Choose item to spawn
-		var items : Array<String> = ["none", "coin", "purse"];
-		var weights : Array<Float> = [70, 20, 10];
+		var items : Array<String> = ["none", "coin", "purse", "heart"];
+		var weights : Array<Float> = [70, 20, 10, 40 - GameStatusManager.getPlayerHP()*10];
 		var selected : Int = FlxRandom.weightedPick(weights);
 		// Instantiate it
 		switch (items[selected])
@@ -146,6 +146,9 @@ class Enemy extends Entity
 			case "purse":
 				var coin : Coin = new Coin(getMidpoint().x, getMidpoint().y, world, 10);
 				world.collectibles.add(coin);
+			case "heart":
+				var heart : Heart = new Heart(getMidpoint().x, getMidpoint().y, world);
+				world.collectibles.add(heart);
 		}
 	}
 	
